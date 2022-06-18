@@ -4,6 +4,7 @@ import com.jordanbunke.jbjgl.io.JBJGLFileIO;
 import com.jordanbunke.wordleplus.WPConstants;
 import com.jordanbunke.wordleplus.WPRecent;
 import com.jordanbunke.wordleplus.WPSettings;
+import com.jordanbunke.wordleplus.WordleSearch;
 import com.jordanbunke.wordleplus.utility.WPRandom;
 
 import java.nio.file.Path;
@@ -63,5 +64,40 @@ public class WordList {
     public static boolean isLegalGoalWord(final String candidate, final int lengthIndex) {
         return candidate.length() == WPConstants.LENGTHS[lengthIndex] &&
                 !WPRecent.containsCandidate(lengthIndex, candidate);
+    }
+
+    // WORD SEARCH EXTENSION
+
+    public static String[] getWordsMatchingSearchQuery(
+            final int lengthIndex, final String query) {
+        final String[] matchingWords = new String[WORD_LISTS[lengthIndex].length];
+        int matchingCount = 0;
+
+        for (String word : WORD_LISTS[lengthIndex]) {
+            if (wordMatchesSearchQuery(word, query)) {
+                matchingWords[matchingCount] = word;
+                matchingCount++;
+            }
+        }
+
+        final String[] results = new String[matchingCount];
+        System.arraycopy(matchingWords, 0, results, 0, matchingCount);
+
+        return results;
+    }
+
+    private static boolean wordMatchesSearchQuery(
+            final String word, final String query) {
+        if (word.length() != query.length())
+            return false;
+
+        final int LENGTH = word.length();
+
+        for (int i = 0; i < LENGTH; i++)
+            if (word.charAt(i) != query.charAt(i) &&
+                    query.charAt(i) != WordleSearch.BLANK_CHAR)
+                return false;
+
+        return true;
     }
 }
