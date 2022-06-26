@@ -42,6 +42,8 @@ public class WPGameState extends ProgramContext {
     private int endgameCountdown;
 
     private JBJGLImage renderState;
+    private boolean isDrawing;
+    private JBJGLImage lastRenderState;
 
     public enum FinishStatus {
         PLAYING, WON, LOST
@@ -62,6 +64,8 @@ public class WPGameState extends ProgramContext {
 
         finishStatus = FinishStatus.PLAYING;
         endgameCountdown = -1;
+
+        isDrawing = false;
 
         initializeGuesses();
         draw();
@@ -143,6 +147,8 @@ public class WPGameState extends ProgramContext {
     }
 
     public void draw() {
+        isDrawing = true;
+
         renderState = JBJGLImage.create(WPConstants.WIDTH, WPConstants.HEIGHT);
         final Graphics g = renderState.getGraphics();
 
@@ -155,6 +161,17 @@ public class WPGameState extends ProgramContext {
         if (endgameCountdown == 0)
             drawEndgame(g);
 
+        g.dispose();
+
+        isDrawing = false;
+        drawLastRenderState();
+    }
+
+    private void drawLastRenderState() {
+        lastRenderState = JBJGLImage.create(WPConstants.WIDTH, WPConstants.HEIGHT);
+        final Graphics g = lastRenderState.getGraphics();
+
+        g.drawImage(renderState, 0, 0, null);
         g.dispose();
     }
 
@@ -356,7 +373,8 @@ public class WPGameState extends ProgramContext {
 
     @Override
     public void render(final Graphics g, final JBJGLGameDebugger debugger) {
-        g.drawImage(renderState, 0, 0, null);
+        final JBJGLImage toRender = isDrawing ? lastRenderState : renderState;
+        g.drawImage(toRender, 0, 0, null);
 
         gameButtons.render(g, debugger);
     }
@@ -366,6 +384,7 @@ public class WPGameState extends ProgramContext {
         // pass on for the buttons in the game state
         gameButtons.process(listener, null);
 
+        // TODO - remove once everything works
         for (ControlScheme.Action action : ControlScheme.Action.values())
             listener.checkForMatchingKeyStroke(
                     ControlScheme.getKeyEvent(action), action::behaviour);

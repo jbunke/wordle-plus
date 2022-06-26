@@ -5,14 +5,17 @@ import com.jordanbunke.jbjgl.debug.JBJGLGameDebugger;
 import com.jordanbunke.jbjgl.game.JBJGLGame;
 import com.jordanbunke.jbjgl.game.JBJGLGameEngine;
 import com.jordanbunke.jbjgl.game.JBJGLGameManager;
+import com.jordanbunke.jbjgl.io.JBJGLInputTask;
+import com.jordanbunke.jbjgl.io.JBJGLListener;
 import com.jordanbunke.wordleplus.gameplay.WPGameState;
+import com.jordanbunke.wordleplus.io.ControlScheme;
 import com.jordanbunke.wordleplus.io.WPParserWriter;
 import com.jordanbunke.wordleplus.menu.Menus;
 import com.jordanbunke.wordleplus.utility.WPImages;
 
 public class WordlePlus {
     public static final String TITLE = "Wordle+";
-    public static final String VERSION = "0.1.2";
+    public static final String VERSION = "0.1.3";
 
     public static final int MENU_STATE_INDEX = 0, GAME_STATE_INDEX = 1;
 
@@ -60,6 +63,19 @@ public class WordlePlus {
         debugger = gameEngine.getDebugger();
 
         debugger.hideBoundingBoxes();
+
+        setControls();
+    }
+
+    private static void setControls() {
+        final JBJGLListener listener = gameEngine.getWindow().getListener();
+
+        for (ControlScheme.Action action : ControlScheme.Action.values()) {
+            final JBJGLInputTask task = JBJGLInputTask.create(
+                    () -> ControlScheme.getKeyEvent(action), action::behaviour);
+
+            listener.addTask(task);
+        }
     }
 
     private static void loadGameData() {
