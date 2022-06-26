@@ -383,10 +383,5 @@ public class WPGameState extends ProgramContext {
     public void process(final JBJGLListener listener) {
         // pass on for the buttons in the game state
         gameButtons.process(listener, null);
-
-        // TODO - remove once everything works
-        for (ControlScheme.Action action : ControlScheme.Action.values())
-            listener.checkForMatchingKeyStroke(
-                    ControlScheme.getKeyEvent(action), action::behaviour);
     }
 }
