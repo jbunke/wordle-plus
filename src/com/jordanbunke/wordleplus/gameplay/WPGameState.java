@@ -11,7 +11,6 @@ import com.jordanbunke.wordleplus.WPConstants;
 import com.jordanbunke.wordleplus.WPRecent;
 import com.jordanbunke.wordleplus.WPSettings;
 import com.jordanbunke.wordleplus.WPStats;
-import com.jordanbunke.wordleplus.io.ControlScheme;
 import com.jordanbunke.wordleplus.io.WordList;
 import com.jordanbunke.wordleplus.menu.Menus;
 import com.jordanbunke.wordleplus.utility.WPColors;
