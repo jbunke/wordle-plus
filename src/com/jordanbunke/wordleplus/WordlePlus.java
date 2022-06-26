@@ -64,10 +64,10 @@ public class WordlePlus {
 
         debugger.hideBoundingBoxes();
 
-        setControls();
+        setInputTasks();
     }
 
-    private static void setControls() {
+    private static void setInputTasks() {
         final JBJGLListener listener = gameEngine.getWindow().getListener();
 
         for (ControlScheme.Action action : ControlScheme.Action.values()) {
