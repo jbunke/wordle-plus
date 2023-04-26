@@ -6,8 +6,6 @@ import com.jordanbunke.wordleplus.WordlePlus;
 import com.jordanbunke.wordleplus.gameplay.Guess;
 
 public class ControlScheme {
-    private static final JBJGLKeyEvent.Action KEYSTROKE_ACTION = JBJGLKeyEvent.Action.PRESS;
-
     public enum Action {
         BACKSPACE, ATTEMPT_SUBMIT,
         TYPE_A, TYPE_B, TYPE_C, TYPE_D,
@@ -20,11 +18,9 @@ public class ControlScheme {
 
         JBJGLKeyEvent getKeyEvent() {
             return switch (this) {
-                case BACKSPACE -> JBJGLKeyEvent.generate(JBJGLKey.BACKSPACE, KEYSTROKE_ACTION);
-                case ATTEMPT_SUBMIT -> JBJGLKeyEvent.generate(JBJGLKey.ENTER, KEYSTROKE_ACTION);
-                default -> JBJGLKeyEvent.generate(JBJGLKey.valueOf(
-                        this.name().substring("TYPE_".length())
-                ), KEYSTROKE_ACTION);
+                case BACKSPACE -> JBJGLKeyEvent.generate(JBJGLKey.BACKSPACE, JBJGLKeyEvent.Action.PRESS);
+                case ATTEMPT_SUBMIT -> JBJGLKeyEvent.generate(JBJGLKey.ENTER, JBJGLKeyEvent.Action.PRESS);
+                default -> JBJGLKeyEvent.generateTyped(Character.toLowerCase(name().charAt("TYPE_".length())));
             };
         }
 

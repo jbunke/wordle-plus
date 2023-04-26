@@ -179,7 +179,7 @@ public class WPGameState extends ProgramContext {
         panelG.fillRect(0, 0, PANEL_WIDTH, PANEL_HEIGHT);
 
         final JBJGLImage title = JBJGLTextBuilder.initialize(
-                4, JBJGLText.Orientation.CENTER, panelTitleColor, WPFonts.ITALICS_SPACED()
+                4.0, JBJGLText.Orientation.CENTER, panelTitleColor, WPFonts.ITALICS_SPACED()
         ).addText("YOU " + (winScreen ? "WON!" : "LOST...")).build().draw();
         panelG.drawImage(title, (PANEL_WIDTH / 2) - (title.getWidth() / 2), 0, null);
 
@@ -227,7 +227,7 @@ public class WPGameState extends ProgramContext {
 
     private JBJGLImage getTextLine(final String text) {
         return JBJGLTextBuilder.initialize(
-                2, JBJGLText.Orientation.CENTER, WPColors.WHITE, WPFonts.STANDARD()
+                2.0, JBJGLText.Orientation.CENTER, WPColors.WHITE, WPFonts.STANDARD()
         ).addText(text).build().draw();
     }
 
@@ -265,7 +265,7 @@ public class WPGameState extends ProgramContext {
         g.fillRect(0, 0, SQUARE_DIM, SQUARE_DIM);
 
         final JBJGLImage letterText = JBJGLTextBuilder.initialize(
-                textSize, JBJGLText.Orientation.LEFT,
+                (double)textSize, JBJGLText.Orientation.LEFT,
                 letterColor, WPFonts.STANDARD()
         ).addText(String.valueOf(letter).toUpperCase()).build().draw();
 

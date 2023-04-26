@@ -12,7 +12,7 @@ import com.jordanbunke.wordleplus.utility.WPImages;
 
 public class WordlePlus {
     public static final String TITLE = "Wordle+";
-    public static final String VERSION = "0.1.2";
+    public static final String VERSION = "0.2.0";
 
     public static final int MENU_STATE_INDEX = 0, GAME_STATE_INDEX = 1;
 

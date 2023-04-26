@@ -119,10 +119,10 @@ public class MenuHelper {
 
             elements[baseIndex] = JBJGLTextMenuElement.generate(
                     new int[] { xs[i], HEADING_Y }, JBJGLMenuElement.Anchor.CENTRAL_TOP,
-                    generateRegularMenuText(2, headings[i]));
+                    generateRegularMenuText(2., headings[i]));
             elements[baseIndex + 1] = JBJGLTextMenuElement.generate(
                     new int[] { xs[i], VALUE_Y }, JBJGLMenuElement.Anchor.CENTRAL_TOP,
-                    generateRegularMenuText(4, String.valueOf(results[i])));
+                    generateRegularMenuText(4., String.valueOf(results[i])));
         }
 
         return JBJGLMenuElementGrouping.generate(elements);
@@ -153,13 +153,13 @@ public class MenuHelper {
 
             elements[baseIndex] = JBJGLTextMenuElement.generate(
                     new int[] { LEFT_TEXT_X, y }, JBJGLMenuElement.Anchor.CENTRAL_TOP,
-                    generateRegularMenuText(1, guessesText));
+                    generateRegularMenuText(1., guessesText));
             elements[baseIndex + 1] = JBJGLStaticMenuElement.generate(
                     new int[] { BAR_INITIAL_X, y + 12 }, JBJGLMenuElement.Anchor.LEFT_TOP,
                     generateSolidRectangle(barWidth, BAR_HEIGHT, barColor));
             elements[baseIndex + 2] = JBJGLTextMenuElement.generate(
                     new int[] { RIGHT_TEXT_X, y }, JBJGLMenuElement.Anchor.LEFT_TOP,
-                    generateRegularMenuText(1, String.valueOf(guesses[i])));
+                    generateRegularMenuText(1., String.valueOf(guesses[i])));
         }
 
         return JBJGLMenuElementGrouping.generate(elements);
@@ -185,13 +185,13 @@ public class MenuHelper {
             final JBJGLMenuElement descriptorLabel = JBJGLTextMenuElement.generate(
                     new int[] { (int)(width * 0.05), drawY + TEXT_ON_BUTTON_Y },
                     JBJGLMenuElement.Anchor.LEFT_TOP, JBJGLTextBuilder.initialize(
-                            2, JBJGLText.Orientation.LEFT,
+                            2., JBJGLText.Orientation.LEFT,
                             WPColors.BLACK, WPFonts.STANDARD()).
                             addText(descriptors[i]).build());
             final JBJGLMenuElement valueLabel = JBJGLTextMenuElement.generate(
                     new int[] { (int)(width * 0.8), drawY + TEXT_ON_BUTTON_Y },
                     JBJGLMenuElement.Anchor.CENTRAL_TOP, JBJGLTextBuilder.initialize(
-                                    2, JBJGLText.Orientation.LEFT,
+                                    2., JBJGLText.Orientation.LEFT,
                                     WPColors.BLACK, WPFonts.STANDARD()).
                             addText(value.toString()).build());
             final JBJGLMenuElement decrementButton = generateSettingsButton(
@@ -270,7 +270,7 @@ public class MenuHelper {
 
     public static JBJGLTextMenuElement generateMenuTitle(final String title) {
         final int width = WPConstants.WIDTH;
-        final JBJGLText text = generateRegularMenuText(4, title);
+        final JBJGLText text = generateRegularMenuText(4., title);
 
         return JBJGLTextMenuElement.generate(
                 new int[] { width / 2, TITLE_Y },
@@ -289,11 +289,11 @@ public class MenuHelper {
         final int width = WPConstants.WIDTH, height = WPConstants.HEIGHT, margin = 4;
 
         final JBJGLText versionAndDev = JBJGLTextBuilder.initialize(
-                1, JBJGLText.Orientation.LEFT,
+                1., JBJGLText.Orientation.LEFT,
                 WPColors.BLACK, WPFonts.STANDARD()).addText("version " + WordlePlus.VERSION)
                 .addLineBreak().addText("Jordan Bunke, 2022").build();
         final JBJGLText inspiration = JBJGLTextBuilder.initialize(
-                1, JBJGLText.Orientation.RIGHT, WPColors.BLACK, WPFonts.STANDARD()
+                1., JBJGLText.Orientation.RIGHT, WPColors.BLACK, WPFonts.STANDARD()
         ).addText("inspired by \"Wordle\" by Josh Wardle").build();
 
         return JBJGLMenuElementGrouping.generateOf(
@@ -310,7 +310,7 @@ public class MenuHelper {
 
     /* HIDDEN */
 
-    private static JBJGLText generateRegularMenuText(final int textSize, final String text) {
+    private static JBJGLText generateRegularMenuText(final double textSize, final String text) {
         return JBJGLTextBuilder.initialize(
                 textSize, JBJGLText.Orientation.CENTER,
                 WPColors.BLACK, WPFonts.STANDARD()).addText(text).build();
@@ -386,7 +386,7 @@ public class MenuHelper {
     private static JBJGLImage drawNonHighlightedButton(
             final int width, final String label, final Color color
     ) {
-        JBJGLImage text = drawText(label, 2, WPFonts.STANDARD(), color);
+        JBJGLImage text = drawText(label, 2., WPFonts.STANDARD(), color);
 
         final int height = text.getHeight();
         final int trueWidth = Math.max(
@@ -403,13 +403,13 @@ public class MenuHelper {
     }
 
     private static JBJGLImage drawText(
-            final String label, final int size, final Font font, final Color color
+            final String label, final double size, final Font font, final Color color
     ) {
         return generateText(label, size, font, color).draw();
     }
 
     private static JBJGLText generateText(
-            final String label, final int size, final Font font, final Color color
+            final String label, final double size, final Font font, final Color color
     ) {
         return JBJGLTextBuilder.initialize(
                 size, JBJGLText.Orientation.CENTER,
@@ -452,7 +452,7 @@ public class MenuHelper {
         hbg.setColor(WPColors.BLACK);
         hbg.fillRect(0, 0, width, height);
         drawTextOnButton(hbg,
-                drawText(label, 2, WPFonts.ITALICS_SPACED(), WPColors.WHITE),
+                drawText(label, 2., WPFonts.ITALICS_SPACED(), WPColors.WHITE),
                 width);
 
         return highlightedButton;
