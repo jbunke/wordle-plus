@@ -5,6 +5,7 @@ import com.jordanbunke.jbjgl.debug.JBJGLGameDebugger;
 import com.jordanbunke.jbjgl.game.JBJGLGame;
 import com.jordanbunke.jbjgl.game.JBJGLGameEngine;
 import com.jordanbunke.jbjgl.game.JBJGLGameManager;
+import com.jordanbunke.jbjgl.window.JBJGLOnStartup;
 import com.jordanbunke.wordleplus.gameplay.WPGameState;
 import com.jordanbunke.wordleplus.io.WPParserWriter;
 import com.jordanbunke.wordleplus.menu.Menus;
@@ -25,6 +26,8 @@ public class WordlePlus {
     public static JBJGLGame game;
 
     public static void main(String[] args) {
+        JBJGLOnStartup.run();
+
         processArgs(args);
         launch();
     }

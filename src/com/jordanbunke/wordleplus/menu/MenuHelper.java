@@ -3,11 +3,13 @@ package com.jordanbunke.wordleplus.menu;
 import com.jordanbunke.jbjgl.fonts.Font;
 import com.jordanbunke.jbjgl.image.JBJGLImage;
 import com.jordanbunke.jbjgl.io.JBJGLImageIO;
+import com.jordanbunke.jbjgl.io.JBJGLResourceLoader;
 import com.jordanbunke.jbjgl.menus.JBJGLMenu;
 import com.jordanbunke.jbjgl.menus.menu_elements.*;
 import com.jordanbunke.jbjgl.text.JBJGLText;
 import com.jordanbunke.jbjgl.text.JBJGLTextBuilder;
 import com.jordanbunke.wordleplus.WPConstants;
+import com.jordanbunke.wordleplus.WPResources;
 import com.jordanbunke.wordleplus.WPStats;
 import com.jordanbunke.wordleplus.WordlePlus;
 import com.jordanbunke.wordleplus.utility.WPColors;
@@ -16,7 +18,6 @@ import com.jordanbunke.wordleplus.utility.WPImages;
 
 import java.awt.*;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
@@ -80,12 +81,12 @@ public class MenuHelper {
     public static JBJGLMenuElement generateReloadButton() {
         final int MARGIN = 8;
 
-        final Path folder = Paths.get("resources", "icons");
-        final Path nhPath = folder.resolve(Paths.get("reload.png"));
-        final Path hPath = folder.resolve(Paths.get("reload-highlighted.png"));
+        final Path folder = WPResources.getIconFolder(),
+                nhPath = folder.resolve("reload.png"),
+                hPath = folder.resolve("reload-highlighted.png");
 
-        final JBJGLImage nhSource = JBJGLImageIO.readImage(nhPath);
-        final JBJGLImage hSource = JBJGLImageIO.readImage(hPath);
+        final JBJGLImage nhSource = JBJGLResourceLoader.loadImageResource(WPResources.class, nhPath);
+        final JBJGLImage hSource = JBJGLResourceLoader.loadImageResource(WPResources.class, hPath);
 
         final int width = nhSource.getWidth(), height = nhSource.getHeight();
 

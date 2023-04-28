@@ -1,17 +1,14 @@
 package com.jordanbunke.wordleplus.io;
 
 import com.jordanbunke.jbjgl.io.JBJGLFileIO;
-import com.jordanbunke.wordleplus.WPConstants;
-import com.jordanbunke.wordleplus.WPRecent;
-import com.jordanbunke.wordleplus.WPSettings;
-import com.jordanbunke.wordleplus.WordleSearch;
+import com.jordanbunke.jbjgl.io.JBJGLResourceLoader;
+import com.jordanbunke.wordleplus.*;
 import com.jordanbunke.wordleplus.utility.WPRandom;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class WordList {
-    private static final Path WORD_LISTS_FOLDER = Paths.get("resources", "word-lists");
+    private static final Path WORD_LISTS_FOLDER = WPResources.getWordListFolder();
     private static final String NEW_LINE = "\n";
 
     private static final String[][] WORD_LISTS = generateWordLists();
@@ -21,9 +18,11 @@ public class WordList {
 
         for (int i = 0; i < 4; i++) {
             final Path filename = WORD_LISTS_FOLDER.resolve(
-                    Paths.get((i + WPConstants.INDEX_TO_LENGTH_OFFSET) + "l.txt"));
+                    (i + WPConstants.INDEX_TO_LENGTH_OFFSET) + "l.txt");
 
-            wordLists[i] = JBJGLFileIO.readFile(filename).split(NEW_LINE);
+            wordLists[i] = JBJGLFileIO.readResource(
+                    JBJGLResourceLoader.loadResource(WPResources.class, filename), filename.toString()
+            ).split(NEW_LINE);
         }
 
         return wordLists;

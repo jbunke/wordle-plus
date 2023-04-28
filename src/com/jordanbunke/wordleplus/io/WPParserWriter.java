@@ -1,30 +1,29 @@
 package com.jordanbunke.wordleplus.io;
 
 import com.jordanbunke.jbjgl.io.JBJGLFileIO;
-import com.jordanbunke.wordleplus.WPConstants;
-import com.jordanbunke.wordleplus.WPRecent;
-import com.jordanbunke.wordleplus.WPSettings;
-import com.jordanbunke.wordleplus.WPStats;
+import com.jordanbunke.jbjgl.io.JBJGLResourceLoader;
+import com.jordanbunke.jbjgl.utility.JBJGLGlobal;
+import com.jordanbunke.wordleplus.*;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class WPParserWriter {
     public static final String NOT_FOUND = "!!!";
 
-    private static final Path RESOURCE_ROOT = Paths.get("resources");
-    private static final Path SETTINGS_FILE =
-            RESOURCE_ROOT.resolve(Paths.get("settings", "settings.txt"));
-    private static final Path RECENT_FILE =
-            RESOURCE_ROOT.resolve(Paths.get("word-lists", "recent", "recent.txt"));
-    private static final Path STATS_FOLDER =
-            RESOURCE_ROOT.resolve(Paths.get("stats"));
-    private static final Path GUESSES_FILE = STATS_FOLDER.resolve(Paths.get("guesses.txt"));
-    private static final Path RESULTS_FILE = STATS_FOLDER.resolve(Paths.get("results.txt"));
+    private static final Path GAME_DATA_ROOT = Path.of("game_data");
+    private static final Path SETTINGS_FILE = GAME_DATA_ROOT.resolve(Path.of("settings", "settings.txt"));
+    private static final Path
+            RECENT_FILE = GAME_DATA_ROOT.resolve(Path.of("recent", "recent.txt")),
+            ALT_RECENT_FILE = WPResources.getAltFolder().resolve("recent.txt");
+    private static final Path STATS_FOLDER = GAME_DATA_ROOT.resolve("stats"),
+            GUESSES_FILE = STATS_FOLDER.resolve("guesses.txt"),
+            ALT_GUESSES_FILE = WPResources.getAltFolder().resolve("guesses.txt"),
+            RESULTS_FILE = STATS_FOLDER.resolve("results.txt"),
+            ALT_RESULTS_FILE = WPResources.getAltFolder().resolve("results.txt");
 
-    private static final String
+    private static final String EMPTY = "",
             CONTENT_FOLLOWING = ":",
             BIG_OPEN = "{", BIG_CLOSE = "}",
             BIG_SEP = ";",
@@ -42,9 +41,22 @@ public class WPParserWriter {
     public static void loadSettings() {
         final String text = JBJGLFileIO.readFile(SETTINGS_FILE);
 
-        final int wordLength = Integer.parseInt(extractFromTag(WORD_LENGTH, text));
-        final int surplusGuesses = Integer.parseInt(extractFromTag(SURPLUS_GUESSES, text));
-        final double freqEx = Double.parseDouble(extractFromTag(FREQUENCY_EXPONENT, text));
+        final int wordLength, surplusGuesses;
+        final double freqEx;
+
+        if (text == null || text.equals(EMPTY)) {
+            JBJGLGlobal.printMessageToJBJGLChannel("No settings file found. Settings set to defaults.");
+
+            wordLength = WPSettings.getWordLength();
+            surplusGuesses = WPSettings.getGuessToLetterSurplus();
+            freqEx = WPSettings.getFrequencyExponent();
+        } else {
+            JBJGLGlobal.printMessageToJBJGLChannel(WordlePlus.TITLE + " settings read successfully!");
+
+            wordLength = Integer.parseInt(extractFromTag(WORD_LENGTH, text));
+            surplusGuesses = Integer.parseInt(extractFromTag(SURPLUS_GUESSES, text));
+            freqEx = Double.parseDouble(extractFromTag(FREQUENCY_EXPONENT, text));
+        }
 
         WPSettings.setWordLength(wordLength);
         WPSettings.setGuessToLetterSurplus(surplusGuesses);
@@ -52,7 +64,7 @@ public class WPParserWriter {
     }
 
     public static void loadRecentWords() {
-        wordLengthDependentDataLoader(RECENT_FILE, WPRecent::setRecentWordsForLength);
+        wordLengthDependentDataLoader(RECENT_FILE, ALT_RECENT_FILE, WPRecent::setRecentWordsForLength);
     }
 
     public static void loadStats() {
@@ -61,16 +73,21 @@ public class WPParserWriter {
     }
 
     private static void loadGuessesStats() {
-        wordLengthDependentDataLoader(GUESSES_FILE, WPStats::setGuesses);
+        wordLengthDependentDataLoader(GUESSES_FILE, ALT_GUESSES_FILE, WPStats::setGuesses);
     }
 
     private static void loadResultsStats() {
-        wordLengthDependentDataLoader(RESULTS_FILE, WPStats::setResults);
+        wordLengthDependentDataLoader(RESULTS_FILE, ALT_RESULTS_FILE, WPStats::setResults);
     }
 
     private static void wordLengthDependentDataLoader(
-            final Path file, BiConsumer<Integer, String[]> setter) {
-        final String text = JBJGLFileIO.readFile(file);
+            final Path file, final Path altResource,
+            BiConsumer<Integer, String[]> setter) {
+        String text = JBJGLFileIO.readFile(file);
+
+        if (text == null || text.equals(EMPTY))
+            text = JBJGLFileIO.readResource(JBJGLResourceLoader.loadResource(
+                    WPResources.class, altResource), altResource.toString());
 
         for (int i = 0; i < WPConstants.NUM_WORD_LENGTH_OPTIONS; i++) {
             final String tag = (i + WPConstants.INDEX_TO_LENGTH_OFFSET) + "l";

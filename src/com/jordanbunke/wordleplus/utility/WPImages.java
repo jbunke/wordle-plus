@@ -14,7 +14,7 @@ public class WPImages {
     private static final JBJGLImage BACKGROUND = generateBackground();
 
     private static JBJGLImage generateIcon() {
-        return generateLetterPanel('W', 32, 2);
+        return generateLetterPanel('W', 32, 2.);
     }
 
     private static JBJGLImage generateBackground() {
@@ -40,7 +40,7 @@ public class WPImages {
         for (int i = 0; i < LENGTH; i++) {
             final char c = title.charAt(i);
 
-            final JBJGLImage letterPanel = generateLetterPanel(c, SQUARE_DIM, 3);
+            final JBJGLImage letterPanel = generateLetterPanel(c, SQUARE_DIM, 3.);
 
             logoG.drawImage(letterPanel, (SQUARE_DIM + MARGIN) * i, 0, null);
         }
@@ -50,7 +50,7 @@ public class WPImages {
     }
 
     private static JBJGLImage generateLetterPanel(
-            final char c, final int SQUARE_DIM, final int textSize
+            final char c, final int SQUARE_DIM, final double textSize
     ) {
         final JBJGLImage letterPanel = JBJGLImage.create(SQUARE_DIM, SQUARE_DIM);
         final Graphics letterG = letterPanel.getGraphics();
@@ -62,7 +62,7 @@ public class WPImages {
                 textSize, JBJGLText.Orientation.CENTER, WPColors.WHITE, WPFonts.STANDARD()
         ).addText(String.valueOf(c)).build().draw();
         letterG.drawImage(letter,
-                ((SQUARE_DIM / 2) - (letter.getWidth() / 2)) + textSize,
+                ((SQUARE_DIM / 2) - (letter.getWidth() / 2)) + (int)textSize,
                 -(SQUARE_DIM / 2), null);
 
         letterG.dispose();
