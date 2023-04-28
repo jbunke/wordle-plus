@@ -291,7 +291,7 @@ public class MenuHelper {
 
         final JBJGLText versionAndDev = JBJGLTextBuilder.initialize(
                 1., JBJGLText.Orientation.LEFT,
-                WPColors.BLACK, WPFonts.STANDARD()).addText("version " + WordlePlus.VERSION)
+                WPColors.BLACK, WPFonts.STANDARD()).addText("v" + WPConstants.VERSION)
                 .addLineBreak().addText("Jordan Bunke, 2022").build();
         final JBJGLText inspiration = JBJGLTextBuilder.initialize(
                 1., JBJGLText.Orientation.RIGHT, WPColors.BLACK, WPFonts.STANDARD()

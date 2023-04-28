@@ -51,7 +51,7 @@ public class WPParserWriter {
             surplusGuesses = WPSettings.getGuessToLetterSurplus();
             freqEx = WPSettings.getFrequencyExponent();
         } else {
-            JBJGLGlobal.printMessageToJBJGLChannel(WordlePlus.TITLE + " settings read successfully!");
+            JBJGLGlobal.printMessageToJBJGLChannel(WPConstants.TITLE + " settings read successfully!");
 
             wordLength = Integer.parseInt(extractFromTag(WORD_LENGTH, text));
             surplusGuesses = Integer.parseInt(extractFromTag(SURPLUS_GUESSES, text));
@@ -195,7 +195,7 @@ public class WPParserWriter {
         return parsed;
     }
 
-    private static String encloseInTag(final String tag, final String content) {
+    public static String encloseInTag(final String tag, final String content) {
         return tag + CONTENT_FOLLOWING + BIG_OPEN + content + BIG_CLOSE;
     }
 

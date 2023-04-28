@@ -1,20 +1,18 @@
 package com.jordanbunke.wordleplus;
 
+import com.jordanbunke.jbjgl.JBJGLOnStartup;
 import com.jordanbunke.jbjgl.contexts.JBJGLMenuManager;
 import com.jordanbunke.jbjgl.debug.JBJGLGameDebugger;
 import com.jordanbunke.jbjgl.game.JBJGLGame;
 import com.jordanbunke.jbjgl.game.JBJGLGameEngine;
 import com.jordanbunke.jbjgl.game.JBJGLGameManager;
-import com.jordanbunke.jbjgl.window.JBJGLOnStartup;
+import com.jordanbunke.jbjgl.utility.JBJGLGlobal;
 import com.jordanbunke.wordleplus.gameplay.WPGameState;
 import com.jordanbunke.wordleplus.io.WPParserWriter;
 import com.jordanbunke.wordleplus.menu.Menus;
 import com.jordanbunke.wordleplus.utility.WPImages;
 
 public class WordlePlus {
-    public static final String TITLE = "Wordle+";
-    public static final String VERSION = "0.2.0";
-
     public static final int MENU_STATE_INDEX = 0, GAME_STATE_INDEX = 1;
 
     public static JBJGLMenuManager menuManager;
@@ -33,15 +31,19 @@ public class WordlePlus {
     }
 
     private static void processArgs(final String[] args) {
-        final String RESET_ARG = "r";
+        final String RESET_ARG = "r", INCREMENT_BUILD_VERSION_ARG = "ibv";
 
-        boolean resetFlag = false;
+        boolean resetFlag = false, incrementBuildVersionFlag = false;
 
         for (String arg : args)
             if (arg.equals(RESET_ARG)) {
                 resetFlag = true;
-                break;
+            } else if (arg.equals(INCREMENT_BUILD_VERSION_ARG)) {
+                incrementBuildVersionFlag = true;
             }
+
+        if (incrementBuildVersionFlag)
+            incrementBuildVersion();
 
         if (resetFlag)
             resetGameData();
@@ -55,7 +57,7 @@ public class WordlePlus {
 
         manager = JBJGLGameManager.createOf(MENU_STATE_INDEX,
                 menuManager, gameState);
-        game = JBJGLGame.create(TITLE, manager,
+        game = JBJGLGame.create(WPConstants.TITLE, manager,
                 WPConstants.WIDTH, WPConstants.HEIGHT,
                 WPImages.getIcon(),
                 true, false, WPConstants.UPDATE_HZ, WPConstants.TARGET_FPS);
@@ -96,8 +98,16 @@ public class WordlePlus {
         WPParserWriter.saveStats(reset);
     }
 
-    public static void resetGameData() {
+    private static void resetGameData() {
         saveGameData(true);
         loadGameData();
+    }
+
+    private static void incrementBuildVersion() {
+        WPConstants.VERSION.incrementBuild();
+
+        JBJGLGlobal.printMessageToJBJGLChannel(WPConstants.TITLE + " build version incremented to " + WPConstants.VERSION);
+
+        WPConstants.writeInfoFile();
     }
 }

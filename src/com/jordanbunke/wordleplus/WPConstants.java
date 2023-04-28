@@ -1,5 +1,14 @@
 package com.jordanbunke.wordleplus;
 
+import com.jordanbunke.jbjgl.Constants;
+import com.jordanbunke.jbjgl.io.JBJGLFileIO;
+import com.jordanbunke.jbjgl.io.JBJGLResourceLoader;
+import com.jordanbunke.jbjgl.utility.JBJGLVersion;
+import com.jordanbunke.jbjgl.utility.StringProcessing;
+import com.jordanbunke.wordleplus.io.WPParserWriter;
+
+import java.nio.file.Path;
+
 public class WPConstants {
     public static final int WIDTH = 800, HEIGHT = 600;
 
@@ -11,4 +20,43 @@ public class WPConstants {
 
     public static final int[] LENGTHS = new int[] { 4, 5, 6, 7 };
     public static final int RECENT_WORDS_BUFFER_SIZE = 50;
+
+    private static final String INFO_FILENAME = "wordle_plus_info.txt", CODEBASE_RESOURCE_ROOT = "res",
+            TITLE_TAG = "title", VERSION_TAG = "version";
+
+    public static final String TITLE;
+    public static final JBJGLVersion VERSION;
+
+    static {
+        final String SEPARATOR = ":", OPEN = "{", CLOSE = "}";
+        final int HAS_BUILD_LENGTH = 4, MAJOR = 0, MINOR = 1, PATCH = 2, BUILD = 3;
+
+        final Path INFO_FILE = Path.of(INFO_FILENAME);
+        final String contents = JBJGLFileIO.readResource(
+                JBJGLResourceLoader.loadResource(Constants.class, INFO_FILE), INFO_FILE.toString());
+
+        TITLE = StringProcessing.getContentsFromTag(contents,
+                TITLE_TAG, SEPARATOR, OPEN, CLOSE, "failed");
+
+        final String[] versionInfo = StringProcessing.getContentsFromTag(contents,
+                VERSION_TAG, SEPARATOR, OPEN, CLOSE, "1.0.0").split("\\.");
+
+        if (versionInfo.length == HAS_BUILD_LENGTH)
+            VERSION = JBJGLVersion.generate(Integer.parseInt(versionInfo[MAJOR]),
+                    Integer.parseInt(versionInfo[MINOR]), Integer.parseInt(versionInfo[PATCH]),
+                    Integer.parseInt(versionInfo[BUILD]));
+        else
+            VERSION = JBJGLVersion.generate(Integer.parseInt(versionInfo[MAJOR]),
+                    Integer.parseInt(versionInfo[MINOR]), Integer.parseInt(versionInfo[PATCH]));
+    }
+
+    public static void writeInfoFile() {
+        final String[] infoFileContents = new String[] {
+                WPParserWriter.encloseInTag(TITLE_TAG, TITLE),
+                WPParserWriter.encloseInTag(VERSION_TAG, VERSION.toString()),
+                ""
+        };
+
+        JBJGLFileIO.writeFile(Path.of(CODEBASE_RESOURCE_ROOT, INFO_FILENAME), infoFileContents);
+    }
 }

@@ -103,7 +103,7 @@ public class WordleSearch {
     private static void welcomeMessage() {
         printDivider();
         printLine("Welcome to the word pattern search engine for " +
-                WordlePlus.TITLE + " (v" + WordlePlus.VERSION + ")!");
+                WPConstants.TITLE + " (v" + WPConstants.VERSION + ")!");
         printLine("");
         printLine("Enter \"" + QUIT_CODE + "\" to quit.");
     }

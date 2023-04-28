@@ -4,7 +4,6 @@ import com.jordanbunke.jbjgl.image.JBJGLImage;
 import com.jordanbunke.jbjgl.text.JBJGLText;
 import com.jordanbunke.jbjgl.text.JBJGLTextBuilder;
 import com.jordanbunke.wordleplus.WPConstants;
-import com.jordanbunke.wordleplus.WordlePlus;
 
 import java.awt.*;
 
@@ -30,7 +29,7 @@ public class WPImages {
     }
 
     private static JBJGLImage generateLogo() {
-        final String title = WordlePlus.TITLE;
+        final String title = WPConstants.TITLE;
         final int SQUARE_DIM = 48, MARGIN = 8, LENGTH = title.length();
 
         final JBJGLImage logo = JBJGLImage.create(
@@ -61,9 +60,7 @@ public class WPImages {
         final JBJGLImage letter = JBJGLTextBuilder.initialize(
                 textSize, JBJGLText.Orientation.CENTER, WPColors.WHITE, WPFonts.STANDARD()
         ).addText(String.valueOf(c)).build().draw();
-        letterG.drawImage(letter,
-                ((SQUARE_DIM / 2) - (letter.getWidth() / 2)) + (int)textSize,
-                -(SQUARE_DIM / 2), null);
+        letterG.drawImage(letter, (SQUARE_DIM / 2) - (letter.getWidth() / 2), -(SQUARE_DIM / 2), null);
 
         letterG.dispose();
         return letterPanel;
