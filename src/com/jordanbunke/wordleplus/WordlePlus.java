@@ -6,7 +6,6 @@ import com.jordanbunke.jbjgl.debug.JBJGLGameDebugger;
 import com.jordanbunke.jbjgl.game.JBJGLGame;
 import com.jordanbunke.jbjgl.game.JBJGLGameEngine;
 import com.jordanbunke.jbjgl.game.JBJGLGameManager;
-import com.jordanbunke.jbjgl.utility.JBJGLGlobal;
 import com.jordanbunke.wordleplus.gameplay.WPGameState;
 import com.jordanbunke.wordleplus.io.WPParserWriter;
 import com.jordanbunke.wordleplus.menu.Menus;
@@ -105,9 +104,6 @@ public class WordlePlus {
 
     private static void incrementBuildVersion() {
         WPConstants.VERSION.incrementBuild();
-
-        JBJGLGlobal.printMessageToJBJGLChannel(WPConstants.TITLE + " build version incremented to " + WPConstants.VERSION);
-
         WPConstants.writeInfoFile();
     }
 }

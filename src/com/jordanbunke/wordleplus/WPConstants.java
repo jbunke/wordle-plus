@@ -33,7 +33,7 @@ public class WPConstants {
 
         final Path INFO_FILE = Path.of(INFO_FILENAME);
         final String contents = JBJGLFileIO.readResource(
-                JBJGLResourceLoader.loadResource(Constants.class, INFO_FILE), INFO_FILE.toString());
+                JBJGLResourceLoader.loadResource(Constants.class, INFO_FILE), INFO_FILENAME);
 
         TITLE = StringProcessing.getContentsFromTag(contents,
                 TITLE_TAG, SEPARATOR, OPEN, CLOSE, "failed");
