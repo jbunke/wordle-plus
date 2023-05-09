@@ -2,16 +2,12 @@ package com.jordanbunke.wordleplus.menu;
 
 import com.jordanbunke.jbjgl.fonts.Font;
 import com.jordanbunke.jbjgl.image.JBJGLImage;
-import com.jordanbunke.jbjgl.io.JBJGLImageIO;
 import com.jordanbunke.jbjgl.io.JBJGLResourceLoader;
 import com.jordanbunke.jbjgl.menus.JBJGLMenu;
 import com.jordanbunke.jbjgl.menus.menu_elements.*;
 import com.jordanbunke.jbjgl.text.JBJGLText;
 import com.jordanbunke.jbjgl.text.JBJGLTextBuilder;
-import com.jordanbunke.wordleplus.WPConstants;
-import com.jordanbunke.wordleplus.WPResources;
-import com.jordanbunke.wordleplus.WPStats;
-import com.jordanbunke.wordleplus.WordlePlus;
+import com.jordanbunke.wordleplus.*;
 import com.jordanbunke.wordleplus.utility.WPColors;
 import com.jordanbunke.wordleplus.utility.WPFonts;
 import com.jordanbunke.wordleplus.utility.WPImages;
@@ -94,9 +90,53 @@ public class MenuHelper {
         final JBJGLImage h = drawHighlightedButton(width, height, hSource);
 
         return JBJGLClickableMenuElement.generate(
-                new int[] { MARGIN, (MARGIN * 2) + height }, new int[] { width, height },
+                new int[] { (MARGIN * 2) + width, MARGIN }, new int[] { width, height },
                 JBJGLMenuElement.Anchor.LEFT_TOP, nh, h,
                 () -> WordlePlus.reloadGame(false));
+    }
+
+    public static JBJGLToggleClickableMenuElement generateShowHideLettersButton() {
+        final int MARGIN = 8, BUTTON_WIDTH = 160;
+
+        final JBJGLImage[] nhbs = new JBJGLImage[] {
+                drawNonHighlightedButton(BUTTON_WIDTH, "HIDE", WPColors.BLACK),
+                drawNonHighlightedButton(BUTTON_WIDTH, "SHOW", WPColors.BLACK)
+        };
+        final JBJGLImage[] hbs = new JBJGLImage[] {
+                drawHighlightedButton("HIDE", nhbs[0]),
+                drawHighlightedButton("SHOW", nhbs[1])
+        };
+
+        return JBJGLToggleClickableMenuElement.generate(
+                new int[] { WPConstants.WIDTH - MARGIN, MARGIN },
+                new int[] { BUTTON_WIDTH, nhbs[0].getHeight() },
+                JBJGLMenuElement.Anchor.RIGHT_TOP, nhbs, hbs, new Runnable[] {
+                        () -> WPSettings.setLettersHidden(true),
+                        () -> WPSettings.setLettersHidden(false)
+                }, () -> WPSettings.areLettersHidden() ? 1 : 0, WordlePlus::drawGameSafely
+        );
+    }
+
+    public static JBJGLMenuElement generatePlayAgainButton() {
+        final int BUTTON_WIDTH = (int)(WPConstants.WIDTH * 0.7);
+
+        return generateMenuButton("PLAY AGAIN",
+                new int[] { WPConstants.WIDTH / 2, WPConstants.HEIGHT - (2 * BUTTON_LIST_Y_INC) },
+                () -> WordlePlus.reloadGame(false),
+                BUTTON_WIDTH, JBJGLMenuElement.Anchor.CENTRAL_TOP);
+    }
+
+    public static JBJGLMenuElement generateBackToMenuButton() {
+        final int BUTTON_WIDTH = (int)(WPConstants.WIDTH * 0.7);
+
+        return generateMenuButton("BACK TO MENU",
+                new int[] { WPConstants.WIDTH / 2, WPConstants.HEIGHT - BUTTON_LIST_Y_INC },
+                () -> {
+                    WordlePlus.reloadGame(false);
+                    WordlePlus.manager.setActiveStateIndex(WordlePlus.MENU_STATE_INDEX);
+                    WordlePlus.menuManager.setActiveMenuID(MenuIDs.MAIN_MENU);
+                },
+                BUTTON_WIDTH, JBJGLMenuElement.Anchor.CENTRAL_TOP);
     }
 
     public static JBJGLMenuElementGrouping generateResultsSummary(final int[] results) {

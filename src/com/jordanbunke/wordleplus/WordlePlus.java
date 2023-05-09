@@ -86,6 +86,11 @@ public class WordlePlus {
         manager.setGameStateAtIndex(GAME_STATE_INDEX, gameState);
     }
 
+    public static void drawGameSafely() {
+        if (gameState != null)
+            gameState.draw();
+    }
+
     public static void quitGame() {
         saveGameData(false);
         System.exit(0);

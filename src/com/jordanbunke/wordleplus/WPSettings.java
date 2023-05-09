@@ -15,6 +15,12 @@ public class WPSettings {
     private static int GUESS_TO_LETTER_SURPLUS = 1;
     private static final int MIN_GLS = -1, MAX_GLS = 3;
 
+    private static boolean LETTERS_HIDDEN = false;
+
+    public static boolean areLettersHidden() {
+        return LETTERS_HIDDEN;
+    }
+
     public static int getWordLength() {
         return WORD_LENGTH;
     }
@@ -53,6 +59,10 @@ public class WPSettings {
 
     public static int getMaxGuessToLetterSurplus() {
         return MAX_GLS;
+    }
+
+    public static void setLettersHidden(final boolean lettersHidden) {
+        LETTERS_HIDDEN = lettersHidden;
     }
 
     public static void setWordLength(final Number wordLength) {

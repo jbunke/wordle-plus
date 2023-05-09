@@ -24,9 +24,7 @@ import java.util.Set;
 
 public class WPGameState extends ProgramContext {
 
-    private static final int GUESS_INIT_Y = 8, GUESS_Y_INC = 56;
-
-    private static final JBJGLMenu gameButtons = Menus.generateGameButtons();
+    private JBJGLMenu gameButtons;
 
     private final int length;
     private final int guessesAllowed;
@@ -48,6 +46,8 @@ public class WPGameState extends ProgramContext {
     }
 
     private WPGameState(final int length) {
+        gameButtons = Menus.generateGameButtons();
+
         this.length = length;
         guessesAllowed = length + WPSettings.getGuessToLetterSurplus();
         goalWord = WordList.selectGoalWord(length - WPConstants.INDEX_TO_LENGTH_OFFSET);
@@ -148,12 +148,12 @@ public class WPGameState extends ProgramContext {
 
         g.drawImage(WPImages.getBackground(), 0, 0, null);
 
-        drawGuesses(g);
-
-        drawLetterStatuses(g);
-
         if (endgameCountdown == 0)
             drawEndgame(g);
+        else {
+            drawGuesses(g);
+            drawLetterStatuses(g);
+        }
 
         g.dispose();
     }
@@ -163,7 +163,7 @@ public class WPGameState extends ProgramContext {
                 PANEL_WIDTH = (int)(WPConstants.WIDTH * 0.7),
                 PANEL_HEIGHT = (int)(WPConstants.HEIGHT * 0.55),
                 PANEL_X = (WPConstants.WIDTH / 2) - (PANEL_WIDTH / 2),
-                PANEL_Y = (WPConstants.HEIGHT / 2) - (PANEL_HEIGHT / 2);
+                PANEL_Y = 44;
 
         final boolean winScreen = finishStatus == FinishStatus.WON;
 
@@ -232,14 +232,18 @@ public class WPGameState extends ProgramContext {
     }
 
     private void drawLetterStatuses(final Graphics g) {
+        if (WPSettings.areLettersHidden())
+            return;
+
         final char[] letterChars = new char[] {
                 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
                 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
         };
 
         final int MARGIN = 8, SQUARE_DIM = 48, COLUMNS = 3,
+                ROWS = (int)Math.ceil(letterChars.length / (double)COLUMNS),
                 INITIAL_X = WPConstants.WIDTH - (COLUMNS * (MARGIN + SQUARE_DIM)),
-                INITIAL_Y = MARGIN + GUESS_Y_INC,
+                INITIAL_Y = WPConstants.HEIGHT - (ROWS * (MARGIN + SQUARE_DIM)),
                 INCREMENT = MARGIN + SQUARE_DIM;
 
         for (int i = 0; i < letterChars.length; i++) {
@@ -281,15 +285,18 @@ public class WPGameState extends ProgramContext {
         for (int i = 0; i < guessesAllowed; i++) {
             final Guess guess = guesses[i];
             final boolean submitted = guess.isSubmitted();
-            final int Y = GUESS_INIT_Y + (i * GUESS_Y_INC);
+            // GUESS_INIT_Y + (i * GUESS_Y_INC);
 
             final int SQUARE_DIM = 48, MARGIN = 8;
+            final int GUESS_INIT_Y = (WPConstants.HEIGHT -
+                    ((SQUARE_DIM * guessesAllowed) + (MARGIN * (guessesAllowed - 1)))) / 2;
             final int width = (SQUARE_DIM * length) + (MARGIN * (length - 1));
 
             final JBJGLImage guessImage = JBJGLImage.create(width, SQUARE_DIM);
             final Graphics guessG = guessImage.getGraphics();
 
-            final int X = (WPConstants.WIDTH / 2) - (guessImage.getWidth() / 2);
+            final int x = (WPConstants.WIDTH / 2) - (guessImage.getWidth() / 2);
+            final int y = GUESS_INIT_Y + (i * (SQUARE_DIM + MARGIN));
 
             for (int j = 0; j < length; j++) {
                 final char letter = guess.getLetterAt(j);
@@ -304,7 +311,7 @@ public class WPGameState extends ProgramContext {
 
             guessG.dispose();
 
-            g.drawImage(guessImage, X, Y, null);
+            g.drawImage(guessImage, x, y, null);
         }
     }
 
@@ -349,8 +356,10 @@ public class WPGameState extends ProgramContext {
         if (endgameCountdown > 0) {
             endgameCountdown--;
 
-            if (endgameCountdown == 0)
+            if (endgameCountdown == 0) {
+                gameButtons = Menus.generateEndgameButtons();
                 draw();
+            }
         }
     }
 

@@ -203,7 +203,15 @@ public class Menus {
                     WordlePlus.manager.setActiveStateIndex(WordlePlus.MENU_STATE_INDEX);
                     WordlePlus.menuManager.setActiveMenuID(MenuIDs.MAIN_MENU);
                 }),
-                MenuHelper.generateReloadButton()
+                MenuHelper.generateReloadButton(),
+                MenuHelper.generateShowHideLettersButton()
+        );
+    }
+
+    public static JBJGLMenu generateEndgameButtons() {
+        return JBJGLMenu.of(
+                MenuHelper.generatePlayAgainButton(),
+                MenuHelper.generateBackToMenuButton()
         );
     }
 }
