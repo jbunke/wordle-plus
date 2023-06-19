@@ -1,82 +1,67 @@
 package com.jordanbunke.wordleplus.utility;
 
-import com.jordanbunke.jbjgl.image.JBJGLImage;
-import com.jordanbunke.jbjgl.text.JBJGLText;
-import com.jordanbunke.jbjgl.text.JBJGLTextBuilder;
+import com.jordanbunke.jbjgl.image.GameImage;
+import com.jordanbunke.jbjgl.text.Text;
+import com.jordanbunke.jbjgl.text.TextBuilder;
 import com.jordanbunke.wordleplus.WPConstants;
 
-import java.awt.*;
-
 public class WPImages {
-    private static final JBJGLImage ICON = generateIcon();
-    private static final JBJGLImage LOGO = generateLogo();
-    private static final JBJGLImage BACKGROUND = generateBackground();
+    private static final GameImage ICON = generateIcon();
+    private static final GameImage LOGO = generateLogo();
+    private static final GameImage BACKGROUND = generateBackground();
 
-    private static JBJGLImage generateIcon() {
+    private static GameImage generateIcon() {
         return generateLetterPanel('W', 32, 2.);
     }
 
-    private static JBJGLImage generateBackground() {
+    private static GameImage generateBackground() {
         final int width = WPConstants.WIDTH, height = WPConstants.HEIGHT;
 
-        final JBJGLImage background = JBJGLImage.create(width, height);
-        final Graphics g = background.getGraphics();
-
-        g.setColor(WPColors.BACKGROUND);
-        g.fillRect(0, 0, width, height);
-
-        return background;
+        final GameImage background = new GameImage(width, height);
+        background.fillRectangle(WPColors.BACKGROUND, 0, 0, width, height);
+        return background.submit();
     }
 
-    private static JBJGLImage generateLogo() {
+    private static GameImage generateLogo() {
         final String title = WPConstants.TITLE;
         final int SQUARE_DIM = 48, MARGIN = 8, LENGTH = title.length();
 
-        final JBJGLImage logo = JBJGLImage.create(
-                (LENGTH * SQUARE_DIM) + ((LENGTH - 1) * MARGIN), SQUARE_DIM);
-        final Graphics logoG = logo.getGraphics();
+        final GameImage logo = new GameImage((LENGTH * SQUARE_DIM) + ((LENGTH - 1) * MARGIN), SQUARE_DIM);
 
         for (int i = 0; i < LENGTH; i++) {
             final char c = title.charAt(i);
-
-            final JBJGLImage letterPanel = generateLetterPanel(c, SQUARE_DIM, 3.);
-
-            logoG.drawImage(letterPanel, (SQUARE_DIM + MARGIN) * i, 0, null);
+            logo.draw(generateLetterPanel(c, SQUARE_DIM, 3.), (SQUARE_DIM + MARGIN) * i, 0);
         }
 
-        logoG.dispose();
-        return logo;
+        return logo.submit();
     }
 
-    private static JBJGLImage generateLetterPanel(
+    private static GameImage generateLetterPanel(
             final char c, final int SQUARE_DIM, final double textSize
     ) {
-        final JBJGLImage letterPanel = JBJGLImage.create(SQUARE_DIM, SQUARE_DIM);
-        final Graphics letterG = letterPanel.getGraphics();
+        final GameImage letterPanel = new GameImage(SQUARE_DIM, SQUARE_DIM);
 
-        letterG.setColor(WPColors.RIGHT_SPOT);
-        letterG.fillRect(0, 0, SQUARE_DIM, SQUARE_DIM);
+        letterPanel.fillRectangle(WPColors.RIGHT_SPOT, 0, 0, SQUARE_DIM, SQUARE_DIM);
 
-        final JBJGLImage letter = JBJGLTextBuilder.initialize(
-                textSize, JBJGLText.Orientation.CENTER, WPColors.WHITE, WPFonts.STANDARD()
-        ).addText(String.valueOf(c)).build().draw();
-        letterG.drawImage(letter, (SQUARE_DIM / 2) - (letter.getWidth() / 2), -(SQUARE_DIM / 2), null);
+        final GameImage letter = new TextBuilder(textSize,
+                Text.Orientation.CENTER, WPColors.WHITE,
+                WPFonts.STANDARD()).addText(String.valueOf(c)).build().draw();
+        letterPanel.draw(letter, (SQUARE_DIM / 2) - (letter.getWidth() / 2), -(SQUARE_DIM / 2));
 
-        letterG.dispose();
-        return letterPanel;
+        return letterPanel.submit();
     }
 
     // GETTERS
 
-    public static JBJGLImage getIcon() {
+    public static GameImage getIcon() {
         return ICON;
     }
 
-    public static JBJGLImage getLogo() {
+    public static GameImage getLogo() {
         return LOGO;
     }
 
-    public static JBJGLImage getBackground() {
+    public static GameImage getBackground() {
         return BACKGROUND;
     }
 }

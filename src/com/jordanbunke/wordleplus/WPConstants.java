@@ -1,10 +1,9 @@
 package com.jordanbunke.wordleplus;
 
-import com.jordanbunke.jbjgl.Constants;
-import com.jordanbunke.jbjgl.io.JBJGLFileIO;
-import com.jordanbunke.jbjgl.io.JBJGLResourceLoader;
-import com.jordanbunke.jbjgl.utility.JBJGLVersion;
+import com.jordanbunke.jbjgl.io.FileIO;
+import com.jordanbunke.jbjgl.io.ResourceLoader;
 import com.jordanbunke.jbjgl.utility.StringProcessing;
+import com.jordanbunke.jbjgl.utility.Version;
 import com.jordanbunke.wordleplus.io.WPParserWriter;
 
 import java.nio.file.Path;
@@ -25,15 +24,14 @@ public class WPConstants {
             TITLE_TAG = "title", VERSION_TAG = "version";
 
     public static final String TITLE;
-    public static final JBJGLVersion VERSION;
+    public static final Version VERSION;
 
     static {
         final String SEPARATOR = ":", OPEN = "{", CLOSE = "}";
         final int HAS_BUILD_LENGTH = 4, MAJOR = 0, MINOR = 1, PATCH = 2, BUILD = 3;
 
         final Path INFO_FILE = Path.of(INFO_FILENAME);
-        final String contents = JBJGLFileIO.readResource(
-                JBJGLResourceLoader.loadResource(Constants.class, INFO_FILE), INFO_FILENAME);
+        final String contents = FileIO.readResource(ResourceLoader.loadResource(INFO_FILE), INFO_FILENAME);
 
         TITLE = StringProcessing.getContentsFromTag(contents,
                 TITLE_TAG, SEPARATOR, OPEN, CLOSE, "failed");
@@ -42,11 +40,11 @@ public class WPConstants {
                 VERSION_TAG, SEPARATOR, OPEN, CLOSE, "1.0.0").split("\\.");
 
         if (versionInfo.length == HAS_BUILD_LENGTH)
-            VERSION = JBJGLVersion.generate(Integer.parseInt(versionInfo[MAJOR]),
+            VERSION = new Version(Integer.parseInt(versionInfo[MAJOR]),
                     Integer.parseInt(versionInfo[MINOR]), Integer.parseInt(versionInfo[PATCH]),
                     Integer.parseInt(versionInfo[BUILD]));
         else
-            VERSION = JBJGLVersion.generate(Integer.parseInt(versionInfo[MAJOR]),
+            VERSION = new Version(Integer.parseInt(versionInfo[MAJOR]),
                     Integer.parseInt(versionInfo[MINOR]), Integer.parseInt(versionInfo[PATCH]));
     }
 
@@ -57,6 +55,6 @@ public class WPConstants {
                 ""
         };
 
-        JBJGLFileIO.writeFile(Path.of(CODEBASE_RESOURCE_ROOT, INFO_FILENAME), infoFileContents);
+        FileIO.writeFile(Path.of(CODEBASE_RESOURCE_ROOT, INFO_FILENAME), infoFileContents);
     }
 }

@@ -1,9 +1,9 @@
 package com.jordanbunke.wordleplus.menu;
 
-import com.jordanbunke.jbjgl.contexts.JBJGLMenuManager;
-import com.jordanbunke.jbjgl.menus.JBJGLMenu;
-import com.jordanbunke.jbjgl.menus.menu_elements.JBJGLMenuElement;
-import com.jordanbunke.jbjgl.menus.menu_elements.JBJGLMenuElementGrouping;
+import com.jordanbunke.jbjgl.contexts.MenuManager;
+import com.jordanbunke.jbjgl.menus.Menu;
+import com.jordanbunke.jbjgl.menus.menu_elements.MenuElement;
+import com.jordanbunke.jbjgl.menus.menu_elements.MenuElementGrouping;
 import com.jordanbunke.wordleplus.WPConstants;
 import com.jordanbunke.wordleplus.WPSettings;
 import com.jordanbunke.wordleplus.WPStats;
@@ -14,15 +14,14 @@ import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 public class Menus {
-    public static JBJGLMenuManager initializeMenus() {
-        return JBJGLMenuManager.initialize(
-                generateMainMenu(), MenuIDs.MAIN_MENU);
+    public static MenuManager initializeMenus() {
+        return new MenuManager(generateMainMenu(), MenuIDs.MAIN_MENU);
     }
 
     // SPECIFIC MENUS
 
-    private static JBJGLMenu generateMainMenu() {
-        return JBJGLMenu.of(
+    private static Menu generateMainMenu() {
+        return new Menu(
                 // visual render order
                 MenuHelper.generateBackground(),
                 MenuHelper.generateGameTitle(),
@@ -39,8 +38,8 @@ public class Menus {
         );
     }
 
-    public static JBJGLMenu generateSettingsMenu() {
-        JBJGLMenuElementGrouping buttons;
+    public static Menu generateSettingsMenu() {
+        MenuElementGrouping buttons;
 
         try {
             buttons = MenuHelper.generateSettingsList(
@@ -73,10 +72,10 @@ public class Menus {
                     0
             );
         } catch (Exception e) {
-            buttons = JBJGLMenuElementGrouping.generateOf();
+            buttons = MenuElementGrouping.generateOf();
         }
 
-        final JBJGLMenuElement resetSettingsButton = MenuHelper.generateTopRightCornerButton(
+        final MenuElement resetSettingsButton = MenuHelper.generateTopRightCornerButton(
                 "RESET...", () -> {
                     WPParserWriter.saveSettings(true);
                     WPParserWriter.loadSettings();
@@ -85,12 +84,12 @@ public class Menus {
                 }, WPConstants.WIDTH / 4);
 
         return generateBasicMenu("Settings",
-                JBJGLMenuElementGrouping.generateOf(buttons, resetSettingsButton),
+                MenuElementGrouping.generateOf(buttons, resetSettingsButton),
                 MenuIDs.MAIN_MENU);
     }
 
-    private static JBJGLMenu generateStatsMenu() {
-        final JBJGLMenuElementGrouping buttons = MenuHelper.generateListMenuOptions(
+    private static Menu generateStatsMenu() {
+        final MenuElementGrouping buttons = MenuHelper.generateListMenuOptions(
                 new String[] {
                         "4-LETTER WORDS",
                         "5-LETTER WORDS",
@@ -106,16 +105,16 @@ public class Menus {
                         () -> MenuHelper.linkMenu(MenuIDs.WORD_LENGTH_STATS,
                                 generateWordLengthStatsMenu(WPConstants.SEVEN_L)),
                 }, 0);
-        final JBJGLMenuElement resetStatsButton = MenuHelper.generateTopRightCornerButton(
+        final MenuElement resetStatsButton = MenuHelper.generateTopRightCornerButton(
                 "RESET...", () -> MenuHelper.linkMenu(MenuIDs.YES_NO, generateResetStatsYesNoMenu()),
                 WPConstants.WIDTH / 4);
 
         return generateBasicMenu("Stats",
-                JBJGLMenuElementGrouping.generateOf(buttons, resetStatsButton),
+                MenuElementGrouping.generateOf(buttons, resetStatsButton),
                 MenuIDs.MAIN_MENU);
     }
 
-    private static JBJGLMenu generateWordLengthStatsMenu(final int lengthIndex) {
+    private static Menu generateWordLengthStatsMenu(final int lengthIndex) {
         final String title = (lengthIndex + WPConstants.INDEX_TO_LENGTH_OFFSET) + "-letter words";
         final boolean canGoLower = lengthIndex > WPConstants.FOUR_L;
         final boolean canGoHigher = lengthIndex < WPConstants.SEVEN_L;
@@ -123,19 +122,19 @@ public class Menus {
         final int[] guesses = WPStats.getGuesses(lengthIndex);
         final int[] results = WPStats.getResults(lengthIndex);
 
-        final JBJGLMenuElementGrouping elements = JBJGLMenuElementGrouping.generateOf(
+        final MenuElementGrouping elements = MenuElementGrouping.generateOf(
                 canGoLower
                         ? MenuHelper.generatePreviousButton(
                                 "< " + ((lengthIndex + WPConstants.INDEX_TO_LENGTH_OFFSET) - 1),
                         () -> MenuHelper.linkMenu(MenuIDs.WORD_LENGTH_STATS,
                                 generateWordLengthStatsMenu(lengthIndex - 1)))
-                        : JBJGLMenuElementGrouping.generateOf(),
+                        : MenuElementGrouping.generateOf(),
                 canGoHigher
                         ? MenuHelper.generateNextButton(
                                 ((lengthIndex + WPConstants.INDEX_TO_LENGTH_OFFSET) + 1) + " >",
                         () -> MenuHelper.linkMenu(MenuIDs.WORD_LENGTH_STATS,
                                 generateWordLengthStatsMenu(lengthIndex + 1)))
-                        : JBJGLMenuElementGrouping.generateOf(),
+                        : MenuElementGrouping.generateOf(),
                 MenuHelper.generateGuessGraph(guesses),
                 MenuHelper.generateResultsSummary(results)
         );
@@ -143,7 +142,7 @@ public class Menus {
         return generateBasicMenu(title, elements, MenuIDs.STATS);
     }
 
-    private static JBJGLMenu generateResetStatsYesNoMenu() {
+    private static Menu generateResetStatsYesNoMenu() {
         return generateYesNoMenu(
                 "RESET ALL STATS?",
                 () -> {
@@ -156,38 +155,38 @@ public class Menus {
 
     // REUSABLE
 
-    private static JBJGLMenu generateNotificationPage(
+    private static Menu generateNotificationPage(
             final String notification, final String okayMenuID
     ) {
-        final JBJGLMenuElementGrouping elements =
+        final MenuElementGrouping elements =
                 MenuHelper.generateNotificationElements(notification, okayMenuID);
 
         return generateBasicMenu(" ", null, elements);
     }
 
-    private static JBJGLMenu generateYesNoMenu(
+    private static Menu generateYesNoMenu(
             final String prompt, final Runnable yesBehaviour, final String noBackMenuID
     ) {
-        final JBJGLMenuElementGrouping elements =
+        final MenuElementGrouping elements =
                 MenuHelper.generateYesNoElements(prompt, yesBehaviour, noBackMenuID);
 
         return generateBasicMenu(" ", null, elements);
     }
 
-    private static JBJGLMenu generateBasicMenu(
-            final String title, final JBJGLMenuElementGrouping elements, final String backMenuID
+    private static Menu generateBasicMenu(
+            final String title, final MenuElementGrouping elements, final String backMenuID
     ) {
         return generateBasicMenu(title, () -> MenuHelper.linkMenu(backMenuID), elements);
     }
 
-    private static JBJGLMenu generateBasicMenu(
-            final String title, final Runnable backBehaviour, final JBJGLMenuElementGrouping elements
+    private static Menu generateBasicMenu(
+            final String title, final Runnable backBehaviour, final MenuElementGrouping elements
     ) {
-        final JBJGLMenuElement maybeBackButton = backBehaviour == null
-                        ? JBJGLMenuElementGrouping.generateOf()
+        final MenuElement maybeBackButton = backBehaviour == null
+                        ? MenuElementGrouping.generateOf()
                         : MenuHelper.generateBackButton(backBehaviour);
 
-        return JBJGLMenu.of(
+        return new Menu(
                 // visual render order
                 MenuHelper.generateBackground(),
                 maybeBackButton,
@@ -197,8 +196,8 @@ public class Menus {
 
     // SPECIAL
 
-    public static JBJGLMenu generateGameButtons() {
-        return JBJGLMenu.of(
+    public static Menu generateGameButtons() {
+        return new Menu(
                 MenuHelper.generateBackButton(() -> {
                     WordlePlus.manager.setActiveStateIndex(WordlePlus.MENU_STATE_INDEX);
                     WordlePlus.menuManager.setActiveMenuID(MenuIDs.MAIN_MENU);
@@ -208,8 +207,8 @@ public class Menus {
         );
     }
 
-    public static JBJGLMenu generateEndgameButtons() {
-        return JBJGLMenu.of(
+    public static Menu generateEndgameButtons() {
+        return new Menu(
                 MenuHelper.generatePlayAgainButton(),
                 MenuHelper.generateBackToMenuButton()
         );
