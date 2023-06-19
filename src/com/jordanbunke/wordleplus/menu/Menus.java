@@ -2,8 +2,10 @@ package com.jordanbunke.wordleplus.menu;
 
 import com.jordanbunke.jbjgl.contexts.MenuManager;
 import com.jordanbunke.jbjgl.menus.Menu;
+import com.jordanbunke.jbjgl.menus.MenuBuilder;
+import com.jordanbunke.jbjgl.menus.MenuSelectionLogic;
 import com.jordanbunke.jbjgl.menus.menu_elements.MenuElement;
-import com.jordanbunke.jbjgl.menus.menu_elements.MenuElementGrouping;
+import com.jordanbunke.jbjgl.menus.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.wordleplus.WPConstants;
 import com.jordanbunke.wordleplus.WPSettings;
 import com.jordanbunke.wordleplus.WPStats;
@@ -21,7 +23,7 @@ public class Menus {
     // SPECIFIC MENUS
 
     private static Menu generateMainMenu() {
-        return new Menu(
+        return new MenuBuilder(new MenuElementGrouping(
                 // visual render order
                 MenuHelper.generateBackground(),
                 MenuHelper.generateGameTitle(),
@@ -35,7 +37,7 @@ public class Menus {
                                 WordlePlus::quitGame
                         }, 0),
                 MenuHelper.generateVersionInfo()
-        );
+        )).build(MenuSelectionLogic.basic());
     }
 
     public static Menu generateSettingsMenu() {
@@ -72,7 +74,7 @@ public class Menus {
                     0
             );
         } catch (Exception e) {
-            buttons = MenuElementGrouping.generateOf();
+            buttons = new MenuElementGrouping();
         }
 
         final MenuElement resetSettingsButton = MenuHelper.generateTopRightCornerButton(
@@ -84,7 +86,7 @@ public class Menus {
                 }, WPConstants.WIDTH / 4);
 
         return generateBasicMenu("Settings",
-                MenuElementGrouping.generateOf(buttons, resetSettingsButton),
+                new MenuElementGrouping(buttons, resetSettingsButton),
                 MenuIDs.MAIN_MENU);
     }
 
@@ -110,7 +112,7 @@ public class Menus {
                 WPConstants.WIDTH / 4);
 
         return generateBasicMenu("Stats",
-                MenuElementGrouping.generateOf(buttons, resetStatsButton),
+                new MenuElementGrouping(buttons, resetStatsButton),
                 MenuIDs.MAIN_MENU);
     }
 
@@ -122,19 +124,19 @@ public class Menus {
         final int[] guesses = WPStats.getGuesses(lengthIndex);
         final int[] results = WPStats.getResults(lengthIndex);
 
-        final MenuElementGrouping elements = MenuElementGrouping.generateOf(
+        final MenuElementGrouping elements = new MenuElementGrouping(
                 canGoLower
                         ? MenuHelper.generatePreviousButton(
                                 "< " + ((lengthIndex + WPConstants.INDEX_TO_LENGTH_OFFSET) - 1),
                         () -> MenuHelper.linkMenu(MenuIDs.WORD_LENGTH_STATS,
                                 generateWordLengthStatsMenu(lengthIndex - 1)))
-                        : MenuElementGrouping.generateOf(),
+                        : new MenuElementGrouping(),
                 canGoHigher
                         ? MenuHelper.generateNextButton(
                                 ((lengthIndex + WPConstants.INDEX_TO_LENGTH_OFFSET) + 1) + " >",
                         () -> MenuHelper.linkMenu(MenuIDs.WORD_LENGTH_STATS,
                                 generateWordLengthStatsMenu(lengthIndex + 1)))
-                        : MenuElementGrouping.generateOf(),
+                        : new MenuElementGrouping(),
                 MenuHelper.generateGuessGraph(guesses),
                 MenuHelper.generateResultsSummary(results)
         );
@@ -183,15 +185,16 @@ public class Menus {
             final String title, final Runnable backBehaviour, final MenuElementGrouping elements
     ) {
         final MenuElement maybeBackButton = backBehaviour == null
-                        ? MenuElementGrouping.generateOf()
+                        ? new MenuElementGrouping()
                         : MenuHelper.generateBackButton(backBehaviour);
 
-        return new Menu(
+        return new MenuBuilder(new MenuElementGrouping(
                 // visual render order
                 MenuHelper.generateBackground(),
                 maybeBackButton,
                 MenuHelper.generateMenuTitle(title),
-                elements);
+                elements
+        )).build(MenuSelectionLogic.basic());
     }
 
     // SPECIAL
@@ -208,9 +211,9 @@ public class Menus {
     }
 
     public static Menu generateEndgameButtons() {
-        return new Menu(
+        return new MenuBuilder(new MenuElementGrouping(
                 MenuHelper.generatePlayAgainButton(),
                 MenuHelper.generateBackToMenuButton()
-        );
+        )).build(MenuSelectionLogic.basic());
     }
 }

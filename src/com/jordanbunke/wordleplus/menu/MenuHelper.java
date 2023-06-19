@@ -6,8 +6,12 @@ import com.jordanbunke.jbjgl.io.ResourceLoader;
 import com.jordanbunke.jbjgl.menus.Menu;
 import com.jordanbunke.jbjgl.menus.menu_elements.*;
 import com.jordanbunke.jbjgl.menus.menu_elements.button.SimpleMenuButton;
+import com.jordanbunke.jbjgl.menus.menu_elements.button.SimpleToggleMenuButton;
+import com.jordanbunke.jbjgl.menus.menu_elements.container.MenuElementGrouping;
+import com.jordanbunke.jbjgl.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.jbjgl.text.Text;
 import com.jordanbunke.jbjgl.text.TextBuilder;
+import com.jordanbunke.jbjgl.utility.Coord2D;
 import com.jordanbunke.wordleplus.*;
 import com.jordanbunke.wordleplus.utility.WPColors;
 import com.jordanbunke.wordleplus.utility.WPFonts;
@@ -36,7 +40,7 @@ public class MenuHelper {
     }
 
     public static StaticMenuElement generateBackground() {
-        return StaticMenuElement.generate(new int[] { 0, 0 }, MenuElement.Anchor.LEFT_TOP,
+        return new StaticMenuElement(new Coord2D(), MenuElement.Anchor.LEFT_TOP,
                 WPImages.getBackground());
     }
 
@@ -44,7 +48,7 @@ public class MenuHelper {
         final int MARGIN = 8, BUTTON_WIDTH = 64;
 
         return generateMenuButton(
-                "<", new int[] { MARGIN, MARGIN }, behaviour,
+                "<", new Coord2D(MARGIN, MARGIN), behaviour,
                 BUTTON_WIDTH, MenuElement.Anchor.LEFT_TOP);
     }
 
@@ -54,24 +58,24 @@ public class MenuHelper {
         final int MARGIN = 8;
 
         return generateMenuButton(
-                label, new int[] { WPConstants.WIDTH - MARGIN, MARGIN }, behaviour,
+                label, new Coord2D(WPConstants.WIDTH - MARGIN, MARGIN), behaviour,
                 buttonWidth, MenuElement.Anchor.RIGHT_TOP);
     }
 
     public static MenuElement generatePreviousButton(final String label, final Runnable behaviour) {
         final int MARGIN = 8, BUTTON_WIDTH = 96, HEIGHT = WPConstants.HEIGHT;
 
-        return generateMenuButton(
-                label, new int[] { MARGIN + (BUTTON_WIDTH / 2), HEIGHT / 2 }, behaviour,
-                BUTTON_WIDTH, MenuElement.Anchor.CENTRAL);
+        return generateMenuButton(label,
+                new Coord2D(MARGIN + (BUTTON_WIDTH / 2), HEIGHT / 2),
+                behaviour, BUTTON_WIDTH, MenuElement.Anchor.CENTRAL);
     }
 
     public static MenuElement generateNextButton(final String label, final Runnable behaviour) {
         final int MARGIN = 8, BUTTON_WIDTH = 96, WIDTH = WPConstants.WIDTH, HEIGHT = WPConstants.HEIGHT;
 
-        return generateMenuButton(
-                label, new int[] { WIDTH - (MARGIN + (BUTTON_WIDTH / 2)), HEIGHT / 2 }, behaviour,
-                BUTTON_WIDTH, MenuElement.Anchor.CENTRAL);
+        return generateMenuButton(label,
+                new Coord2D(WIDTH - (MARGIN + (BUTTON_WIDTH / 2)), HEIGHT / 2),
+                behaviour, BUTTON_WIDTH, MenuElement.Anchor.CENTRAL);
     }
 
     public static MenuElement generateReloadButton() {
@@ -90,12 +94,12 @@ public class MenuHelper {
         final GameImage h = drawHighlightedButton(width, height, hSource);
 
         return new SimpleMenuButton(
-                new int[] { (MARGIN * 2) + width, MARGIN }, new int[] { width, height },
-                MenuElement.Anchor.LEFT_TOP, true,
+                new Coord2D((MARGIN * 2) + width, MARGIN),
+                new Coord2D(width, height), MenuElement.Anchor.LEFT_TOP, true,
                 () -> WordlePlus.reloadGame(false), nh, h);
     }
 
-    public static ToggleClickableMenuElement generateShowHideLettersButton() {
+    public static SimpleToggleMenuButton generateShowHideLettersButton() {
         final int MARGIN = 8, BUTTON_WIDTH = 160;
 
         final GameImage[] nhbs = new GameImage[] {
@@ -107,21 +111,21 @@ public class MenuHelper {
                 drawHighlightedButton("SHOW", nhbs[1])
         };
 
-        return ToggleClickableMenuElement.generate(
-                new int[] { WPConstants.WIDTH - MARGIN, MARGIN },
-                new int[] { BUTTON_WIDTH, nhbs[0].getHeight() },
-                MenuElement.Anchor.RIGHT_TOP, nhbs, hbs, new Runnable[] {
+        return new SimpleToggleMenuButton(
+                new Coord2D(WPConstants.WIDTH - MARGIN, MARGIN),
+                new Coord2D(BUTTON_WIDTH, nhbs[0].getHeight()),
+                MenuElement.Anchor.RIGHT_TOP, true, nhbs, hbs, new Runnable[] {
                         () -> WPSettings.setLettersHidden(true),
                         () -> WPSettings.setLettersHidden(false)
-                }, () -> WPSettings.areLettersHidden() ? 1 : 0, WordlePlus::drawGameSafely
-        );
+                }, () -> WPSettings.areLettersHidden() ? 1 : 0,
+                WordlePlus::drawGameSafely);
     }
 
     public static MenuElement generatePlayAgainButton() {
         final int BUTTON_WIDTH = (int)(WPConstants.WIDTH * 0.7);
 
         return generateMenuButton("PLAY AGAIN",
-                new int[] { WPConstants.WIDTH / 2, WPConstants.HEIGHT - (2 * BUTTON_LIST_Y_INC) },
+                new Coord2D(WPConstants.WIDTH / 2, WPConstants.HEIGHT - (2 * BUTTON_LIST_Y_INC)),
                 () -> WordlePlus.reloadGame(false),
                 BUTTON_WIDTH, MenuElement.Anchor.CENTRAL_TOP);
     }
@@ -130,7 +134,7 @@ public class MenuHelper {
         final int BUTTON_WIDTH = (int)(WPConstants.WIDTH * 0.7);
 
         return generateMenuButton("BACK TO MENU",
-                new int[] { WPConstants.WIDTH / 2, WPConstants.HEIGHT - BUTTON_LIST_Y_INC },
+                new Coord2D(WPConstants.WIDTH / 2, WPConstants.HEIGHT - BUTTON_LIST_Y_INC),
                 () -> {
                     WordlePlus.reloadGame(false);
                     WordlePlus.manager.setActiveStateIndex(WordlePlus.MENU_STATE_INDEX);
@@ -153,20 +157,20 @@ public class MenuHelper {
                 results[WPStats.LOSS_INDEX] == 1 ? "loss" : "losses",
                 results[WPStats.FORFEIT_INDEX] == 1 ? "forfeit" : "forfeits"
         };
-        final TextMenuElement[] elements = new TextMenuElement[WPStats.RESULTS_LENGTH * 2];
+        final StaticMenuElement[] elements = new StaticMenuElement[WPStats.RESULTS_LENGTH * 2];
 
         for (int i = 0; i < WPStats.RESULTS_LENGTH; i++) {
             final int baseIndex = i * 2;
 
-            elements[baseIndex] = TextMenuElement.generate(
-                    new int[] { xs[i], HEADING_Y }, MenuElement.Anchor.CENTRAL_TOP,
+            elements[baseIndex] = StaticMenuElement.fromText(
+                    new Coord2D(xs[i], HEADING_Y), MenuElement.Anchor.CENTRAL_TOP,
                     generateRegularMenuText(2., headings[i]));
-            elements[baseIndex + 1] = TextMenuElement.generate(
-                    new int[] { xs[i], VALUE_Y }, MenuElement.Anchor.CENTRAL_TOP,
+            elements[baseIndex + 1] = StaticMenuElement.fromText(
+                    new Coord2D(xs[i], VALUE_Y), MenuElement.Anchor.CENTRAL_TOP,
                     generateRegularMenuText(4., String.valueOf(results[i])));
         }
 
-        return MenuElementGrouping.generate(elements);
+        return new MenuElementGrouping(elements);
     }
 
     public static MenuElementGrouping generateGuessGraph(final int[] guesses) {
@@ -192,18 +196,18 @@ public class MenuHelper {
 
             final String guessesText = (i + 1) + " guess" + (i == 0 ? "" : "es");
 
-            elements[baseIndex] = TextMenuElement.generate(
-                    new int[] { LEFT_TEXT_X, y }, MenuElement.Anchor.CENTRAL_TOP,
+            elements[baseIndex] = StaticMenuElement.fromText(
+                    new Coord2D(LEFT_TEXT_X, y), MenuElement.Anchor.CENTRAL_TOP,
                     generateRegularMenuText(1., guessesText));
-            elements[baseIndex + 1] = StaticMenuElement.generate(
-                    new int[] { BAR_INITIAL_X, y + 12 }, MenuElement.Anchor.LEFT_TOP,
+            elements[baseIndex + 1] = new StaticMenuElement(
+                    new Coord2D(BAR_INITIAL_X, y + 12), MenuElement.Anchor.LEFT_TOP,
                     generateSolidRectangle(barWidth, BAR_HEIGHT, barColor));
-            elements[baseIndex + 2] = TextMenuElement.generate(
-                    new int[] { RIGHT_TEXT_X, y }, MenuElement.Anchor.LEFT_TOP,
+            elements[baseIndex + 2] = StaticMenuElement.fromText(
+                    new Coord2D(RIGHT_TEXT_X, y), MenuElement.Anchor.LEFT_TOP,
                     generateRegularMenuText(1., String.valueOf(guesses[i])));
         }
 
-        return MenuElementGrouping.generate(elements);
+        return new MenuElementGrouping(elements);
     }
 
     public static MenuElementGrouping generateSettingsList(
@@ -223,14 +227,14 @@ public class MenuHelper {
             final Number min = minGetters[i].call(), value = getters[i].call(),
                     max = maxGetters[i].call();
 
-            final MenuElement descriptorLabel = TextMenuElement.generate(
-                    new int[] { (int)(width * 0.05), drawY + TEXT_ON_BUTTON_Y },
+            final MenuElement descriptorLabel = StaticMenuElement.fromText(
+                    new Coord2D((int)(width * 0.05), drawY + TEXT_ON_BUTTON_Y),
                     MenuElement.Anchor.LEFT_TOP,
                     new TextBuilder(2., Text.Orientation.LEFT,
                             WPColors.BLACK, WPFonts.STANDARD())
                             .addText(descriptors[i]).build());
-            final MenuElement valueLabel = TextMenuElement.generate(
-                    new int[] { (int)(width * 0.8), drawY + TEXT_ON_BUTTON_Y },
+            final MenuElement valueLabel = StaticMenuElement.fromText(
+                    new Coord2D((int)(width * 0.8), drawY + TEXT_ON_BUTTON_Y),
                     MenuElement.Anchor.CENTRAL_TOP,
                     new TextBuilder(2., Text.Orientation.LEFT,
                             WPColors.BLACK, WPFonts.STANDARD())
@@ -247,7 +251,7 @@ public class MenuHelper {
             drawY += BUTTON_LIST_Y_INC;
         }
 
-        return MenuElementGrouping.generate(menuElements);
+        return new MenuElementGrouping(menuElements);
     }
 
     public static MenuElementGrouping generateListMenuOptions(
@@ -262,13 +266,13 @@ public class MenuHelper {
 
         for (int i = 0; i < amount; i++) {
             final MenuElement button = generateMenuButton(
-                    headings[i], new int[] { width / 2, drawY }, behaviours[i],
+                    headings[i], new Coord2D(width / 2, drawY), behaviours[i],
                     width / 2, MenuElement.Anchor.CENTRAL_TOP);
             menuElements[i] = button;
             drawY += BUTTON_LIST_Y_INC;
         }
 
-        return MenuElementGrouping.generate(menuElements);
+        return new MenuElementGrouping(menuElements);
     }
 
     public static MenuElementGrouping generateYesNoElements(
@@ -276,17 +280,16 @@ public class MenuHelper {
     ) {
         final int width = WPConstants.WIDTH, height = WPConstants.HEIGHT;
 
-        return MenuElementGrouping.generateOf(
-                TextMenuElement.generate(
-                        new int[] { width / 2, (int)(height * 0.4) },
+        return new MenuElementGrouping(StaticMenuElement.fromText(
+                        new Coord2D(width / 2, (int)(height * 0.4)),
                         MenuElement.Anchor.CENTRAL_TOP,
                         generateText(prompt, 2, WPFonts.ITALICS_SPACED(), WPColors.BLACK)),
                 generateMenuButton("NO",
-                        new int[] { (int)(width * 0.35), (int)(height * 0.6) },
+                        new Coord2D((int)(width * 0.35), (int)(height * 0.6)),
                         () -> MenuHelper.linkMenu(noBackMenuID),
                         width / 6, MenuElement.Anchor.CENTRAL),
                 generateMenuButton("YES",
-                        new int[] { (int)(width * 0.65), (int)(height * 0.6) },
+                        new Coord2D((int)(width * 0.65), (int)(height * 0.6)),
                         yesBehaviour, width / 6,
                         MenuElement.Anchor.CENTRAL)
         );
@@ -297,32 +300,31 @@ public class MenuHelper {
     ) {
         final int width = WPConstants.WIDTH, height = WPConstants.HEIGHT;
 
-        return MenuElementGrouping.generateOf(
-                TextMenuElement.generate(
-                        new int[] { width / 2, (int)(height * 0.4) },
+        return new MenuElementGrouping(
+                StaticMenuElement.fromText(
+                        new Coord2D(width / 2, (int)(height * 0.4)),
                         MenuElement.Anchor.CENTRAL_TOP,
                         generateText(notification, 2, WPFonts.ITALICS_SPACED(), WPColors.BLACK)),
                 generateMenuButton("OKAY",
-                        new int[] { (int)(width * 0.5), (int)(height * 0.6) },
+                        new Coord2D((int)(width * 0.5), (int)(height * 0.6)),
                         () -> MenuHelper.linkMenu(okayMenuID),
                         width / 6, MenuElement.Anchor.CENTRAL)
         );
     }
 
-    public static TextMenuElement generateMenuTitle(final String title) {
+    public static StaticMenuElement generateMenuTitle(final String title) {
         final int width = WPConstants.WIDTH;
         final Text text = generateRegularMenuText(4., title);
 
-        return TextMenuElement.generate(
-                new int[] { width / 2, TITLE_Y },
+        return StaticMenuElement.fromText(
+                new Coord2D(width / 2, TITLE_Y),
                 MenuElement.Anchor.CENTRAL, text);
     }
 
     public static StaticMenuElement generateGameTitle() {
         final int width = WPConstants.WIDTH;
 
-        return StaticMenuElement.generate(
-                new int[] { width / 2, TITLE_Y },
+        return new StaticMenuElement(new Coord2D(width / 2, TITLE_Y),
                 MenuElement.Anchor.CENTRAL, WPImages.getLogo());
     }
 
@@ -337,15 +339,11 @@ public class MenuHelper {
                 1., Text.Orientation.RIGHT, WPColors.BLACK, WPFonts.STANDARD()
         ).addText("inspired by \"Wordle\" by Josh Wardle").build();
 
-        return MenuElementGrouping.generateOf(
-                TextMenuElement.generate(
-                        new int[] { margin, height - margin },
-                        MenuElement.Anchor.LEFT_BOTTOM, versionAndDev
-                ),
-                TextMenuElement.generate(
-                        new int[] { width - margin, height - margin },
-                        MenuElement.Anchor.RIGHT_BOTTOM, inspiration
-                )
+        return new MenuElementGrouping(
+                StaticMenuElement.fromText(new Coord2D(margin, height - margin),
+                        MenuElement.Anchor.LEFT_BOTTOM, versionAndDev),
+                StaticMenuElement.fromText(new Coord2D(width - margin, height - margin),
+                        MenuElement.Anchor.RIGHT_BOTTOM, inspiration)
         );
     }
 
@@ -374,7 +372,7 @@ public class MenuHelper {
 
         return generateMenuButton(
                 isDecrement ? "-" : "+",
-                new int[] { isDecrement ? DECREMENT_X : INCREMENT_X, drawY },
+                new Coord2D(isDecrement ? DECREMENT_X : INCREMENT_X, drawY),
                 behaviour, width / 12, MenuElement.Anchor.CENTRAL_TOP);
     }
 
@@ -389,7 +387,7 @@ public class MenuHelper {
     }
 
     private static MenuElement generateMenuButton(
-            final String label, final int[] position,
+            final String label, final Coord2D position,
             final Runnable behaviour, final int width,
             final MenuElement.Anchor anchor
     ) {
@@ -401,10 +399,10 @@ public class MenuHelper {
 
         return hasBehaviour
                 ? new SimpleMenuButton(position,
-                new int[] { width, nonHighlightedButton.getHeight() },
+                new Coord2D(width, nonHighlightedButton.getHeight()),
                 anchor, true, behaviour, nonHighlightedButton,
                 highlightedButton)
-                : StaticMenuElement.generate(position, anchor, nonHighlightedButton);
+                : new StaticMenuElement(position, anchor, nonHighlightedButton);
     }
 
     private static GameImage drawNonHighlightedButton(

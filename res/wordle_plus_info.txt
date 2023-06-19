@@ -1,2 +1,2 @@
 title:{Wordle+}
-version:{0.2.2.4}
+version:{0.2.2.7}
