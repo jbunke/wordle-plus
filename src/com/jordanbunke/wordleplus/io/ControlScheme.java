@@ -1,7 +1,7 @@
 package com.jordanbunke.wordleplus.io;
 
-import com.jordanbunke.jbjgl.events.JBJGLKey;
-import com.jordanbunke.jbjgl.events.JBJGLKeyEvent;
+import com.jordanbunke.jbjgl.events.GameKeyEvent;
+import com.jordanbunke.jbjgl.events.Key;
 import com.jordanbunke.wordleplus.WordlePlus;
 import com.jordanbunke.wordleplus.gameplay.Guess;
 
@@ -16,11 +16,11 @@ public class ControlScheme {
         TYPE_U, TYPE_V, TYPE_W, TYPE_X,
         TYPE_Y, TYPE_Z;
 
-        JBJGLKeyEvent getKeyEvent() {
+        GameKeyEvent getKeyEvent() {
             return switch (this) {
-                case BACKSPACE -> JBJGLKeyEvent.generate(JBJGLKey.BACKSPACE, JBJGLKeyEvent.Action.PRESS);
-                case ATTEMPT_SUBMIT -> JBJGLKeyEvent.generate(JBJGLKey.ENTER, JBJGLKeyEvent.Action.PRESS);
-                default -> JBJGLKeyEvent.generateTyped(Character.toLowerCase(name().charAt("TYPE_".length())));
+                case BACKSPACE -> GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS);
+                case ATTEMPT_SUBMIT -> GameKeyEvent.newKeyStroke(Key.ENTER, GameKeyEvent.Action.PRESS);
+                default -> GameKeyEvent.newTypedKey(Character.toLowerCase(name().charAt("TYPE_".length())));
             };
         }
 
@@ -45,7 +45,7 @@ public class ControlScheme {
         }
     }
 
-    public static JBJGLKeyEvent getKeyEvent(final Action action) {
+    public static GameKeyEvent getKeyEvent(final Action action) {
         return action.getKeyEvent();
     }
 }

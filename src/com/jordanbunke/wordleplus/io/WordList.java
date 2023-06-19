@@ -1,7 +1,7 @@
 package com.jordanbunke.wordleplus.io;
 
-import com.jordanbunke.jbjgl.io.JBJGLFileIO;
-import com.jordanbunke.jbjgl.io.JBJGLResourceLoader;
+import com.jordanbunke.jbjgl.io.FileIO;
+import com.jordanbunke.jbjgl.io.ResourceLoader;
 import com.jordanbunke.wordleplus.*;
 import com.jordanbunke.wordleplus.utility.WPRandom;
 
@@ -20,8 +20,8 @@ public class WordList {
             final Path filename = WORD_LISTS_FOLDER.resolve(
                     (i + WPConstants.INDEX_TO_LENGTH_OFFSET) + "l.txt");
 
-            wordLists[i] = JBJGLFileIO.readResource(
-                    JBJGLResourceLoader.loadResource(WPResources.class, filename), filename.toString()
+            wordLists[i] = FileIO.readResource(
+                    ResourceLoader.loadResource(filename), filename.toString()
             ).split(NEW_LINE);
         }
 

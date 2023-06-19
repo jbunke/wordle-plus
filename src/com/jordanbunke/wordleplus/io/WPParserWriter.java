@@ -1,7 +1,8 @@
 package com.jordanbunke.wordleplus.io;
 
-import com.jordanbunke.jbjgl.io.JBJGLFileIO;
-import com.jordanbunke.jbjgl.io.JBJGLResourceLoader;
+import com.jordanbunke.jbjgl.error.GameError;
+import com.jordanbunke.jbjgl.io.FileIO;
+import com.jordanbunke.jbjgl.io.ResourceLoader;
 import com.jordanbunke.jbjgl.utility.JBJGLGlobal;
 import com.jordanbunke.wordleplus.*;
 
@@ -39,19 +40,19 @@ public class WPParserWriter {
     // LOAD
 
     public static void loadSettings() {
-        final String text = JBJGLFileIO.readFile(SETTINGS_FILE);
+        final String text = FileIO.readFile(SETTINGS_FILE);
 
         final int wordLength, surplusGuesses;
         final double freqEx;
 
         if (text == null || text.equals(EMPTY)) {
-            JBJGLGlobal.printMessageToJBJGLChannel("No settings file found. Settings set to defaults.");
+            GameError.send("No settings file found. Settings set to defaults.");
 
             wordLength = WPSettings.getWordLength();
             surplusGuesses = WPSettings.getGuessToLetterSurplus();
             freqEx = WPSettings.getFrequencyExponent();
         } else {
-            JBJGLGlobal.printMessageToJBJGLChannel(WPConstants.TITLE + " settings read successfully!");
+            JBJGLGlobal.print(WPConstants.TITLE + " settings read successfully!");
 
             wordLength = Integer.parseInt(extractFromTag(WORD_LENGTH, text));
             surplusGuesses = Integer.parseInt(extractFromTag(SURPLUS_GUESSES, text));
@@ -83,11 +84,10 @@ public class WPParserWriter {
     private static void wordLengthDependentDataLoader(
             final Path file, final Path altResource,
             BiConsumer<Integer, String[]> setter) {
-        String text = JBJGLFileIO.readFile(file);
+        String text = FileIO.readFile(file);
 
         if (text == null || text.equals(EMPTY))
-            text = JBJGLFileIO.readResource(JBJGLResourceLoader.loadResource(
-                    WPResources.class, altResource), altResource.toString());
+            text = FileIO.readResource(ResourceLoader.loadResource(altResource), altResource.toString());
 
         for (int i = 0; i < WPConstants.NUM_WORD_LENGTH_OPTIONS; i++) {
             final String tag = (i + WPConstants.INDEX_TO_LENGTH_OFFSET) + "l";
@@ -129,7 +129,7 @@ public class WPParserWriter {
                         reset ? 2.0 : WPSettings.getFrequencyExponent()
                 )) + NEW_LINE;
 
-        JBJGLFileIO.writeFile(SETTINGS_FILE, contents);
+        FileIO.writeFile(SETTINGS_FILE, contents);
     }
 
     public static void saveRecentWords(final boolean reset) {
@@ -172,7 +172,7 @@ public class WPParserWriter {
             sb.append(NEW_LINE);
         }
 
-        JBJGLFileIO.writeFile(file, sb.toString());
+        FileIO.writeFile(file, sb.toString());
     }
 
     // BUILD

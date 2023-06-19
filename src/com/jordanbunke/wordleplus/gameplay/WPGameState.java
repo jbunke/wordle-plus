@@ -1,12 +1,12 @@
 package com.jordanbunke.wordleplus.gameplay;
 
 import com.jordanbunke.jbjgl.contexts.ProgramContext;
-import com.jordanbunke.jbjgl.debug.JBJGLGameDebugger;
-import com.jordanbunke.jbjgl.image.JBJGLImage;
-import com.jordanbunke.jbjgl.io.JBJGLListener;
-import com.jordanbunke.jbjgl.menus.JBJGLMenu;
-import com.jordanbunke.jbjgl.text.JBJGLText;
-import com.jordanbunke.jbjgl.text.JBJGLTextBuilder;
+import com.jordanbunke.jbjgl.debug.GameDebugger;
+import com.jordanbunke.jbjgl.image.GameImage;
+import com.jordanbunke.jbjgl.io.InputEventLogger;
+import com.jordanbunke.jbjgl.menus.Menu;
+import com.jordanbunke.jbjgl.text.Text;
+import com.jordanbunke.jbjgl.text.TextBuilder;
 import com.jordanbunke.wordleplus.WPConstants;
 import com.jordanbunke.wordleplus.WPRecent;
 import com.jordanbunke.wordleplus.WPSettings;
@@ -24,7 +24,7 @@ import java.util.Set;
 
 public class WPGameState extends ProgramContext {
 
-    private JBJGLMenu gameButtons;
+    private Menu gameButtons;
 
     private final int length;
     private final int guessesAllowed;
@@ -39,7 +39,7 @@ public class WPGameState extends ProgramContext {
     private FinishStatus finishStatus;
     private int endgameCountdown;
 
-    private JBJGLImage renderState;
+    private GameImage renderState;
 
     public enum FinishStatus {
         PLAYING, WON, LOST
@@ -143,22 +143,21 @@ public class WPGameState extends ProgramContext {
     }
 
     public void draw() {
-        renderState = JBJGLImage.create(WPConstants.WIDTH, WPConstants.HEIGHT);
-        final Graphics g = renderState.getGraphics();
+        renderState = new GameImage(WPConstants.WIDTH, WPConstants.HEIGHT);
 
-        g.drawImage(WPImages.getBackground(), 0, 0, null);
+        renderState.draw(WPImages.getBackground());
 
         if (endgameCountdown == 0)
-            drawEndgame(g);
+            drawEndgame();
         else {
-            drawGuesses(g);
-            drawLetterStatuses(g);
+            drawGuesses();
+            drawLetterStatuses();
         }
 
-        g.dispose();
+        renderState.free();
     }
 
-    private void drawEndgame(final Graphics g) {
+    private void drawEndgame() {
         final int SQUARE_DIM = 72, MARGIN = 12,
                 PANEL_WIDTH = (int)(WPConstants.WIDTH * 0.7),
                 PANEL_HEIGHT = (int)(WPConstants.HEIGHT * 0.55),
@@ -172,47 +171,37 @@ public class WPGameState extends ProgramContext {
                 ? WPColors.RIGHT_SPOT
                 : WPColors.NOT_PRESENT;
 
-        final JBJGLImage panel = JBJGLImage.create(PANEL_WIDTH, PANEL_HEIGHT);
-        final Graphics panelG = panel.getGraphics();
+        final GameImage panel = new GameImage(PANEL_WIDTH, PANEL_HEIGHT);
+        panel.fillRectangle(panelBackground, 0, 0, PANEL_WIDTH, PANEL_HEIGHT);
 
-        panelG.setColor(panelBackground);
-        panelG.fillRect(0, 0, PANEL_WIDTH, PANEL_HEIGHT);
-
-        final JBJGLImage title = JBJGLTextBuilder.initialize(
-                4.0, JBJGLText.Orientation.CENTER, panelTitleColor, WPFonts.ITALICS_SPACED()
+        final GameImage title = new TextBuilder(
+                4.0, Text.Orientation.CENTER, panelTitleColor, WPFonts.ITALICS_SPACED()
         ).addText("YOU " + (winScreen ? "WON!" : "LOST...")).build().draw();
-        panelG.drawImage(title, (PANEL_WIDTH / 2) - (title.getWidth() / 2), 0, null);
+        panel.draw(title, (PANEL_WIDTH / 2) - (title.getWidth() / 2), 0);
 
         if (winScreen) {
-            final JBJGLImage guessText = getTextLine("Guesses: " + guessIndex);
-            panelG.drawImage(guessText, (PANEL_WIDTH / 2) - (guessText.getWidth() / 2),
-                    SQUARE_DIM * 2, null);
+            final GameImage guessText = getTextLine("Guesses: " + guessIndex);
+            panel.draw(guessText, (PANEL_WIDTH / 2) - (guessText.getWidth() / 2), SQUARE_DIM * 2);
 
-            final JBJGLImage timeText = getTextLine("Time: " + formatTime());
-            panelG.drawImage(timeText, (PANEL_WIDTH / 2) - (timeText.getWidth() / 2),
-                    SQUARE_DIM * 3, null);
+            final GameImage timeText = getTextLine("Time: " + formatTime());
+            panel.draw(timeText, (PANEL_WIDTH / 2) - (timeText.getWidth() / 2), SQUARE_DIM * 3);
         } else {
-            final JBJGLImage correction = getTextLine("The word was:");
-            panelG.drawImage(correction, (PANEL_WIDTH / 2) - (correction.getWidth() / 2),
-                    SQUARE_DIM * 2, null);
+            final GameImage correction = getTextLine("The word was:");
+            panel.draw(correction, (PANEL_WIDTH / 2) - (correction.getWidth() / 2), SQUARE_DIM * 2);
 
             final int SOLUTION_WIDTH = (SQUARE_DIM * length) + (MARGIN * (length - 1));
 
-            final JBJGLImage solution = JBJGLImage.create(SOLUTION_WIDTH, SQUARE_DIM);
-            final Graphics solutionG = solution.getGraphics();
+            final GameImage solution = new GameImage(SOLUTION_WIDTH, SQUARE_DIM);
 
             for (int i = 0; i < length; i++) {
-                solutionG.drawImage(
-                        drawLetter(goalWord.charAt(i), WPColors.RIGHT_SPOT, 3),
-                        i * (SQUARE_DIM + MARGIN), 0, null);
+                solution.draw(drawLetter(goalWord.charAt(i), WPColors.RIGHT_SPOT, 3),
+                        i * (SQUARE_DIM + MARGIN), 0);
             }
 
-            panelG.drawImage(solution, (PANEL_WIDTH / 2) - (solution.getWidth() / 2),
-                    SQUARE_DIM * 3, null);
+            panel.draw(solution, (PANEL_WIDTH / 2) - (solution.getWidth() / 2), SQUARE_DIM * 3);
         }
 
-        panelG.dispose();
-        g.drawImage(panel, PANEL_X, PANEL_Y, null);
+        renderState.draw(panel.submit(), PANEL_X, PANEL_Y);
     }
 
     private String formatTime() {
@@ -225,13 +214,12 @@ public class WPGameState extends ProgramContext {
             return seconds + "s";
     }
 
-    private JBJGLImage getTextLine(final String text) {
-        return JBJGLTextBuilder.initialize(
-                2.0, JBJGLText.Orientation.CENTER, WPColors.WHITE, WPFonts.STANDARD()
-        ).addText(text).build().draw();
+    private GameImage getTextLine(final String text) {
+        return new TextBuilder(2.0, Text.Orientation.CENTER, WPColors.WHITE,
+                WPFonts.STANDARD()).addText(text).build().draw();
     }
 
-    private void drawLetterStatuses(final Graphics g) {
+    private void drawLetterStatuses() {
         if (WPSettings.areLettersHidden())
             return;
 
@@ -249,39 +237,32 @@ public class WPGameState extends ProgramContext {
         for (int i = 0; i < letterChars.length; i++) {
             final int x = INITIAL_X + ((i % COLUMNS) * INCREMENT),
                     y = INITIAL_Y + ((i / COLUMNS) * INCREMENT);
-            final JBJGLImage letterImage = drawLetter(
+            final GameImage letterImage = drawLetter(
                     letterChars[i], letters.getStatus(letterChars[i]).getColor(), 2);
 
-            g.drawImage(letterImage, x, y, null);
+            renderState.draw(letterImage, x, y);
         }
     }
 
-    private JBJGLImage drawLetter(
+    private GameImage drawLetter(
             final char letter, final Color backgroundColor, final int textSize
     ) {
         final int SQUARE_DIM = 24 * textSize;
-        final JBJGLImage letterImage = JBJGLImage.create(SQUARE_DIM, SQUARE_DIM);
-        final Graphics g = letterImage.getGraphics();
 
-        final Color letterColor = WPColors.WHITE;
+        final GameImage letterImage = new GameImage(SQUARE_DIM, SQUARE_DIM);
+        letterImage.fillRectangle(backgroundColor, 0, 0, SQUARE_DIM, SQUARE_DIM);
 
-        g.setColor(backgroundColor);
-        g.fillRect(0, 0, SQUARE_DIM, SQUARE_DIM);
-
-        final JBJGLImage letterText = JBJGLTextBuilder.initialize(
-                (double)textSize, JBJGLText.Orientation.LEFT,
-                letterColor, WPFonts.STANDARD()
+        final GameImage letterText = new TextBuilder(
+                textSize, Text.Orientation.LEFT, WPColors.WHITE, WPFonts.STANDARD()
         ).addText(String.valueOf(letter).toUpperCase()).build().draw();
 
         final int offset = ((SQUARE_DIM / 2) - (letterText.getWidth() / 2)) + 2;
 
-        g.drawImage(letterText, offset, -4 * textSize, null);
-        g.dispose();
-
-        return letterImage;
+        letterImage.draw(letterText, offset, -4 * textSize);
+        return letterImage.submit();
     }
 
-    private void drawGuesses(final Graphics g) {
+    private void drawGuesses() {
         for (int i = 0; i < guessesAllowed; i++) {
             final Guess guess = guesses[i];
             final boolean submitted = guess.isSubmitted();
@@ -292,8 +273,7 @@ public class WPGameState extends ProgramContext {
                     ((SQUARE_DIM * guessesAllowed) + (MARGIN * (guessesAllowed - 1)))) / 2;
             final int width = (SQUARE_DIM * length) + (MARGIN * (length - 1));
 
-            final JBJGLImage guessImage = JBJGLImage.create(width, SQUARE_DIM);
-            final Graphics guessG = guessImage.getGraphics();
+            final GameImage guessImage = new GameImage(width, SQUARE_DIM);
 
             final int x = (WPConstants.WIDTH / 2) - (guessImage.getWidth() / 2);
             final int y = GUESS_INIT_Y + (i * (SQUARE_DIM + MARGIN));
@@ -305,13 +285,11 @@ public class WPGameState extends ProgramContext {
                         ? getLetterStatus(j, guess.generateWordFromGuess()).getColor()
                         : WPColors.BLACK;
 
-                final JBJGLImage letterImage = drawLetter(letter, backgroundColor, 2);
-                guessG.drawImage(letterImage, letterX, 0, null);
+                final GameImage letterImage = drawLetter(letter, backgroundColor, 2);
+                guessImage.draw(letterImage, letterX, 0);
             }
 
-            guessG.dispose();
-
-            g.drawImage(guessImage, x, y, null);
+            renderState.draw(guessImage.submit(), x, y);
         }
     }
 
@@ -347,8 +325,8 @@ public class WPGameState extends ProgramContext {
     }
 
     @Override
-    public void update() {
-        gameButtons.update();
+    public void update(final double deltaTime) {
+        gameButtons.update(deltaTime);
 
         if (finishStatus == FinishStatus.PLAYING)
             timer++;
@@ -364,19 +342,24 @@ public class WPGameState extends ProgramContext {
     }
 
     @Override
-    public void render(final Graphics g, final JBJGLGameDebugger debugger) {
+    public void render(final Graphics2D g) {
         g.drawImage(renderState, 0, 0, null);
 
-        gameButtons.render(g, debugger);
+        gameButtons.render(g);
     }
 
     @Override
-    public void process(final JBJGLListener listener) {
+    public void debugRender(final Graphics2D g, final GameDebugger debugger) {
+        gameButtons.debugRender(g, debugger);
+    }
+
+    @Override
+    public void process(final InputEventLogger eventLogger) {
         // pass on for the buttons in the game state
-        gameButtons.process(listener, null);
+        gameButtons.process(eventLogger);
 
         for (ControlScheme.Action action : ControlScheme.Action.values())
-            listener.checkForMatchingKeyStroke(
+            eventLogger.checkForMatchingKeyStroke(
                     ControlScheme.getKeyEvent(action), action::behaviour);
     }
 }

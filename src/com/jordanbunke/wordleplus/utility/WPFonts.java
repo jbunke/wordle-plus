@@ -9,10 +9,10 @@ public class WPFonts {
     private static final Path FONT_FOLDER = WPResources.getFontFolder();
 
     private static final Font
-            STANDARD = Font.loadFromSource(FONT_FOLDER, WPResources.class,
+            STANDARD = Font.loadFromSource(FONT_FOLDER, true,
             "font-classic", true, 1.0, 2, false),
 //            "font-hand-drawn", false, 1.0, 2, false),
-            ITALICS_SPACED = Font.loadFromSource(FONT_FOLDER, WPResources.class,
+            ITALICS_SPACED = Font.loadFromSource(FONT_FOLDER, true,
         "font-classic-italics", true, 1.0, 2, false);
 //        "font-hand-drawn", false, 1.0, 6, false);
 
