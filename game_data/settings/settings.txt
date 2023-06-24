@@ -1,3 +1,3 @@
-word-length:{6}
-surplus-guesses:{0}
+word-length:{5}
+surplus-guesses:{1}
 frequency-exponent:{2.0}

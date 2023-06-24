@@ -22,7 +22,7 @@ import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
-public class WPGameState extends ProgramContext {
+public class WPGameState implements ProgramContext {
 
     private Menu gameButtons;
 
@@ -342,15 +342,15 @@ public class WPGameState extends ProgramContext {
     }
 
     @Override
-    public void render(final Graphics2D g) {
-        g.drawImage(renderState, 0, 0, null);
+    public void render(final GameImage canvas) {
+        canvas.draw(renderState, 0, 0);
 
-        gameButtons.render(g);
+        gameButtons.render(canvas);
     }
 
     @Override
-    public void debugRender(final Graphics2D g, final GameDebugger debugger) {
-        gameButtons.debugRender(g, debugger);
+    public void debugRender(final GameImage canvas, final GameDebugger debugger) {
+        gameButtons.debugRender(canvas, debugger);
     }
 
     @Override
